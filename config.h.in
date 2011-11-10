@@ -1,0 +1,8 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#cmakedefine USE_SSE_
+#cmakedefine HAVE_STDINT_H
+#cmakedefine SSE_64_
+#endif
+
