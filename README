@@ -7,7 +7,7 @@ Basic data structures and logging facilities are part of the base package.
 
 In order to build rendering examples SFML needs to be installed and set up correctly.
 
-There are some small optional optimizations done in SSE, they need MASM to be compiled.
+There are some small optional optimizations done in SSE, they need MASM to be compiled. The speedup is probably not drastic so don't bother with if you don't really want to :).
 
 Compiling and installing:
 
