@@ -1,0 +1,19 @@
+VPL 0.1
+
+VPL is a library to generate and manipulate vector paths as well as render them.
+The software renderer is based on: http://mlab.uiah.fi/~kkallio/antialiasing/  
+
+Basic data structures and logging facilities are part of the base package.
+
+In order to build rendering examples SFML needs to be installed and set up correctly.
+
+There are some small optional optimizations done in SSE, they need MASM to be compiled.
+
+Compiling and installing:
+
+cd build
+ccmake ..
+Choose configure options and generate
+make
+
+
