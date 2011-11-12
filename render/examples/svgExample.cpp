@@ -36,13 +36,6 @@ void drawPath(SVGPath* path)
 
         for(vplUint i = 0 ; i < path->segments_.getItemCount();i++)
         {
-             DEBUG() << vpl::commandToString(path->segments_[i].command_)
-                    << " : " << path->segments_[i].args_[0] << ","
-                    << path->segments_[i].args_[1] << ","
-                    << path->segments_[i].args_[2] << ","
-                    << path->segments_[i].args_[3] << ","
-                    << path->segments_[i].args_[4] << ","
-                    << path->segments_[i].args_[5];
 
             newPath->addSegment(path->segments_[i].command_,
                                 path->segments_[i].args_[0],
@@ -122,7 +115,7 @@ bool keyPressedCallback(sf::Key::Code key)
 
     if(key == sf::Key::Q)
     {
-        DEBUG() << "Shear X";
+        STD_DEBUG() << "Shear X";
 
         vpl::ShearMatrix matrix(0.2f,0.0f);
 
@@ -133,7 +126,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     if(key == sf::Key::W)
     {
-        DEBUG() << "Shear Y";
+        STD_DEBUG() << "Shear Y";
 
         vpl::ShearMatrix matrix(0.0f,0.2f);
 
@@ -144,7 +137,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Z)
     {
-        DEBUG() << "Rotate CW";
+        STD_DEBUG() << "Rotate CW";
 
 		vpl::RotationMatrix matrix(0.2f);
 
@@ -155,7 +148,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::X)
     {
-        DEBUG() << "Rotate CCW";
+        STD_DEBUG() << "Rotate CCW";
 
 		vpl::RotationMatrix matrix(-0.2f);
 
@@ -166,7 +159,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Add)
     {
-        DEBUG() << "Zooming in";
+        STD_DEBUG() << "Zooming in";
 
 		vpl::ScalingMatrix matrix(1.5f);
 
@@ -177,7 +170,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Subtract)
     {
-        DEBUG() << "Zooming out";
+        STD_DEBUG() << "Zooming out";
 
 		vpl::ScalingMatrix matrix(0.67f);
 
@@ -188,7 +181,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Up)
     {
-        DEBUG() << "Moving up";
+        STD_DEBUG() << "Moving up";
 
 		vpl::TranslationMatrix matrix(0.0f,-20.0f);
 
@@ -199,7 +192,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Down)
     {
-        DEBUG() << "Moving down";
+        STD_DEBUG() << "Moving down";
 
 		vpl::TranslationMatrix matrix(0.0f,20.0f);
 
@@ -210,7 +203,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Left)
     {
-        DEBUG() << "Moving left";
+        STD_DEBUG() << "Moving left";
 
 		vpl::TranslationMatrix matrix(-20.0f,0.0f);
 
@@ -221,7 +214,7 @@ bool keyPressedCallback(sf::Key::Code key)
     }
     else if(key == sf::Key::Right)
     {
-        DEBUG() << "Moving right";
+        STD_DEBUG() << "Moving right";
 
 		vpl::TranslationMatrix matrix(20.0f,0.0f);
 
