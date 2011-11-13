@@ -48,23 +48,73 @@ namespace vpl
         Pen();
         ~Pen(){}
 
-        inline void setColor(const Color& color)            { color_ = color;}
-        inline void setOpacity(vplUchar alpha)              { color_.setAlpha(alpha);}
-        inline void setGradient(const Gradient* gradient)   { gradient_ = gradient;}
-        inline void setSize(float size)                     { size_ = size;}
-        inline void setMiterLimit(float limit)              { miterLimit_ = limit;}
-        inline void setEndType(Stroker::EndType endType)    { endType_ = endType;}
-        inline void setJoinType(Stroker::JoinType joinType) { joinType_ = joinType;}
-        inline void setBlendMode(BlendMode blendMode)       { blendMode_ = blendMode;}
+        // Setters
+        inline void setColor(const Color& color)
+        {
+            color_ = color;
+        }
+        inline void setOpacity(vplUchar alpha)
+        {
+            color_.setAlpha(alpha);
+        }
+        inline void setGradient(const Gradient* gradient)
+        {
+            gradient_ = gradient;
+        }
+        inline void setSize(float size)
+        {
+            size_ = size;
+        }
+        inline void setMiterLimit(float limit)
+        {
+            miterLimit_ = limit;
+        }
+        inline void setEndType(Stroker::EndType endType)
+        {
+            endType_ = endType;
+        }
+        inline void setJoinType(Stroker::JoinType joinType)
+        {
+            joinType_ = joinType;
+        }
+        inline void setBlendMode(BlendMode blendMode)
+        {
+            blendMode_ = blendMode;
+        }
 
-        inline vplUint32 getColorAsRGBA() const      { return color_.getColorRGBA();}
-        inline vplUint32 getColorAsARGB() const      { return color_.getColorARGB();}
-        inline const Gradient* getGradient() const   { return gradient_;}
-        inline float getSize() const                 { return size_;}
-        inline float getMiterLimit() const           { return miterLimit_;}
-        inline Stroker::EndType getEndType() const   { return endType_;}
-        inline Stroker::JoinType getJoinType() const { return joinType_;}
-        inline BlendMode getBlendMode() const        { return blendMode_;}
+        // Getters
+        inline vplUint32 getColorAsRGBA() const
+        {
+            return color_.getColorRGBA();
+        }
+        inline vplUint32 getColorAsARGB() const
+        {
+            return color_.getColorARGB();
+        }
+        inline const Gradient* getGradient() const
+        {
+            return gradient_;
+        }
+        inline float getSize() const
+        {
+            return size_;
+        }
+        inline float getMiterLimit() const
+        {
+            return miterLimit_;
+        }
+        inline Stroker::EndType getEndType() const
+        {
+            return endType_;
+        }
+        inline Stroker::JoinType getJoinType() const
+        {
+            return joinType_;
+        }
+        inline BlendMode getBlendMode() const
+        {
+            return blendMode_;
+        }
 
     private:
 
@@ -92,17 +142,50 @@ namespace vpl
         Brush(Color color);
         ~Brush(){}
 
-        inline void setColor(const Color& color)           { color_ = color;}
-        inline void setOpacity(vplUchar alpha)             { color_.setAlpha(alpha);}
-        inline void setGradient( const Gradient* gradient) { gradient_ = gradient;}
-        inline void setBlendMode(BlendMode blendMode)      { blendMode_ = blendMode;}
-        inline void setFillMode(FillMode fillMode)         { fillMode_ = fillMode;}
+        // Setters
+        inline void setColor(const Color& color)
+        {
+            color_ = color;
+        }
+        inline void setOpacity(vplUchar alpha)
+        {
+            color_.setAlpha(alpha);
+        }
+        inline void setGradient( const Gradient* gradient)
+        {
+            gradient_ = gradient;
+        }
+        inline void setBlendMode(BlendMode blendMode)
+        {
+            blendMode_ = blendMode;
+        }
+        inline void setFillMode(FillMode fillMode)
+        {
+            fillMode_ = fillMode;
+        }
 
-        inline vplUint32 getColorAsRGBA() const    { return color_.getColorRGBA();}
-        inline vplUint32 getColorAsARGB() const    { return color_.getColorARGB();}
-        inline const Gradient* getGradient() const { return gradient_;}
-        inline BlendMode getBlendMode() const      { return blendMode_;}
-        inline FillMode getFillMode() const        { return fillMode_;}
+        // Getters
+        inline vplUint32 getColorAsRGBA() const
+        {
+            return color_.getColorRGBA();
+        }
+        inline vplUint32 getColorAsARGB() const
+        {
+            return color_.getColorARGB();
+        }
+        inline const Gradient* getGradient() const
+        {
+            return gradient_;
+        }
+        inline BlendMode getBlendMode() const
+        {
+            return blendMode_;
+
+        }
+        inline FillMode getFillMode() const
+        {
+            return fillMode_;
+        }
 
    private:
 
@@ -124,12 +207,30 @@ namespace vpl
         void clear();
         void clear(const Color& color);
 
-        inline vplUint getWidth() const           { return width_;}
-        inline vplUint getHeight() const          { return height_;}
-        inline vplUint getPitch() const           { return pitch_;}
-        inline vplUint getSizeInBytes() const     { return height_*pitch_*sizeof(vplUint32);}
-        inline vplUint32* getBuffer()             { return buffer_;}
-        inline const vplUint32* getBuffer() const { return buffer_;}
+        inline vplUint getWidth() const
+        {
+            return width_;
+        }
+        inline vplUint getHeight() const
+        {
+            return height_;
+        }
+        inline vplUint getPitch() const
+        {
+            return pitch_;
+        }
+        inline vplUint getSizeInBytes() const
+        {
+            return height_*pitch_*sizeof(vplUint32);
+        }
+        inline vplUint32* getBuffer()
+        {
+            return buffer_;
+        }
+        inline const vplUint32* getBuffer() const
+        {
+            return buffer_;
+        }
 
     private:
 
@@ -137,13 +238,6 @@ namespace vpl
         vplUint height_;
         vplUint pitch_;
         vplUint32* buffer_;
-    };
-
-    enum Sampling
-    {
-        cSample8  = 8,
-        cSample16 = 16,
-        cSample32 = 32
     };
 
 	// Forward declarations
@@ -158,6 +252,13 @@ namespace vpl
     class VPL_API Renderer
     {
         public:
+
+            enum Sampling
+            {
+                cSample8  = 8,
+                cSample16 = 16,
+                cSample32 = 32
+            };
 
             Renderer();
             ~Renderer();

@@ -19,8 +19,27 @@
 #include "vplPath.h"
 
 #ifdef USE_SSE_
-extern "C" void PRE_CDECL_ subDivideBezierSSE(float* bezier,
-                                              float* deltas) POST_CDECL_;
+
+extern "C" void PRE_CDECL_ estimateFlatness(float* bezier,float* deltas) POST_CDECL_;
+
+#define DECLARE_ARRAY(a) MEM_ALIGN(a,16)
+
+#else
+
+inline static void estimateFlatness(float* bezier,float* deltas)
+{
+    deltas[0] = 3.0f*bezier[2] - 2.0f*bezier[0] - bezier[6];
+    deltas[0]*= deltas[0];
+    deltas[1] = 3.0f*bezier[3] - 2.0f*bezier[1] - bezier[7];
+    deltas[1]*= deltas[1];
+    deltas[2] = 3.0f*bezier[4] - 2.0f*bezier[6] - bezier[0];
+    deltas[2]*= deltas[2];
+    deltas[3] = 3.0f*bezier[5] - 2.0f*bezier[7] - bezier[1];
+    deltas[3]*= deltas[3];
+}
+
+#define DECLARE_ARRAY(a) a
+
 #endif // USE_SSE__
 
 namespace vpl
@@ -595,14 +614,17 @@ namespace vpl
     // The max recurse depth
     static const char cMaxRecurseStackSize = 32;
 
-    // A bezier segment
-    struct BezierSegment
-    {
-        Vector p1;
-        Vector p2;
-        Vector p3;
-        Vector p4;
-    };
+    // A bezier segment looks like this:
+    // BezierSegment
+    //
+    //    Vector p1;
+    //    Vector p2;
+    //    Vector p3;
+    //    Vector p4;
+    //
+    // I use an array of 8 floats instead since it is
+    // easier to pass to the SSE function
+
 
     void PointGenerator::subDivideBezier(const Vector& from,const Vector& control1,
                                          const Vector& control2,const Vector& to)
@@ -617,12 +639,9 @@ namespace vpl
 		transform_.transform(newControl1);
 		transform_.transform(newControl2);
 
-        // If SSE is enabled only
-        #ifdef USE_SSE_
-
-        // Align data
-        MEM_ALIGN(float bezier[8*cMaxRecurseStackSize],16);
-        MEM_ALIGN(float deltas[4],16);
+        // IF we use SSE, data is aligned via this macro
+        DECLARE_ARRAY(float bezier[8*cMaxRecurseStackSize]);
+        DECLARE_ARRAY(float deltas[4]);
 
         // Pointer into stack
         float* currentBez;
@@ -658,7 +677,7 @@ namespace vpl
             currentBez = bezier + bezIndex*8;
 
             // Call SSE subdivison
-            subDivideBezierSSE(bezier + bezIndex*8,deltas);
+            estimateFlatness(bezier + bezIndex*8,deltas);
 
             // Choose max
             if(*deltas < *(deltas+2))
@@ -708,90 +727,6 @@ namespace vpl
                 *(rightBez+7) = *(currentBez+7);
             }
         }
-        #else
-        float dx1;
-        float dx2;
-        float dy1;
-        float dy2;
-
-        Vector p23;
-        Vector p34;
-        Vector p234;
-
-        BezierSegment bezStack[cMaxRecurseStackSize];
-        BezierSegment* currentBez;
-        BezierSegment* rightBez;
-        BezierSegment* leftBez;
-
-        int bezIndex = 0;
-
-        // Initialize first bezier segment
-        bezStack[0].p1 = newFrom;
-        bezStack[0].p2 = newControl1;
-        bezStack[0].p3 = newControl2;
-        bezStack[0].p4 = newTo;
-
-        // Add very first point
-        addPoint(newFrom);
-
-        while(bezIndex >= 0)
-        {
-            // Get bezier segment from stack
-            currentBez = &bezStack[bezIndex];
-
-            // Estimate flatness of the curve.
-            dx1 = 3.0f*currentBez->p2.x_ - 2.0f*currentBez->p1.x_ - currentBez->p4.x_;
-            dx1*= dx1;
-            dy1 = 3.0f*currentBez->p2.y_ - 2.0f*currentBez->p1.y_ - currentBez->p4.y_;
-            dy1*= dy1;
-            dx2 = 3.0f*currentBez->p3.x_ - 2.0f*currentBez->p4.x_ - currentBez->p1.x_;
-            dx2*= dx2;
-            dy2 = 3.0f*currentBez->p3.y_ - 2.0f*currentBez->p4.y_ - currentBez->p1.y_;
-            dy2*= dy2;
-
-            if(dx1 < dx2)
-                dx1 = dx2;
-            if(dy1 < dy2)
-                dy1 = dy2;
-
-            // Stop if flat enough
-            if (dx1 + dy1 <= deltaLimit_ ||
-                bezIndex == (cMaxRecurseStackSize - 1))
-            {
-                if(bezIndex)
-                    addPoint(currentBez->p4);
-
-                bezIndex--;
-            }
-            else
-            {
-                // Put left subdivision on top of stack
-                // and increse stack size
-                bezIndex++;
-                rightBez = currentBez;
-                leftBez  = &bezStack[bezIndex];
-
-                // Calculate the mid points
-                leftBez->p1  = currentBez->p1;
-                leftBez->p2  = currentBez->p1 + currentBez->p2;
-                leftBez->p2 /= 2.0f ;
-                p23          = currentBez->p2 + currentBez->p3;
-                p23         /= 2.0f;
-                leftBez->p3  = leftBez->p2 + p23;
-                leftBez->p3 /= 2.0f;
-                p34          = currentBez->p3 + currentBez->p4;
-                p34         /= 2.0f;
-                p234         = p23 + p34;
-                p234        /= 2.0f;
-                leftBez->p4  = leftBez->p3 + p234;
-                leftBez->p4 /= 2.0f;
-                rightBez->p1 = leftBez->p4;
-                rightBez->p2 = p234;
-                rightBez->p3 = p34;
-                rightBez->p4 = currentBez->p4;
-            }
-        }
-        #endif
     }
 
     // Arc segment

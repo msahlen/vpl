@@ -235,7 +235,7 @@ int main(int,char** argv)
     vpl::PixelBuffer pixelBuffer;
     vpl::Renderer renderer;
 
-	renderer.setSamplingValue(vpl::cSample8);
+	renderer.setSamplingValue(vpl::Renderer::cSample8);
 
 	svgRenderer = &renderer;
 
@@ -248,7 +248,7 @@ int main(int,char** argv)
            pixelBuffer.initialize(parser.getWidth(),parser.getHeight());
            pixelBuffer.clear(vpl::cWhite);
 
-           renderer.setSamplingValue(vpl::cSample8);
+           renderer.setSamplingValue(vpl::Renderer::cSample8);
            renderer.setTarget(&pixelBuffer);
 
            svgPaths = parser.getPaths();
