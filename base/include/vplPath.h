@@ -105,16 +105,46 @@ namespace vpl
         ~Path(){}
 
         // Move to point x,y. Ends the current subpath
-        inline void moveToAbs(float x,float y)  {addSegment(cMoveToAbs,x,y);}
-        inline void moveToRel(float x,float y)  {addSegment(cMoveToRel,x,y);}
+        inline void moveToAbs(float x,float y)  
+		{
+			addSegment(cMoveToAbs,x,y);
+		}
+
+        inline void moveToRel(float x,float y)  
+		{
+			addSegment(cMoveToRel,x,y);
+		}
 
         // Draw a line to point x,y
-        inline void lineToAbs(float x,float y)  {addSegment(cLineToAbs,x,y);}
-        inline void lineToRel(float x,float y)  {addSegment(cLineToRel,x,y);}
-        inline void horizontalLineToAbs(float x){addSegment(cHorizontalLineToAbs,x);}
-        inline void horizontalLineToRel(float x){addSegment(cHorizontalLineToRel,x);}
-        inline void verticalLineToAbs(float y)  {addSegment(cVerticalLineToAbs,y);}
-        inline void verticalLineToRel(float y)  {addSegment(cVerticalLineToRel,y);}
+        inline void lineToAbs(float x,float y)  
+		{
+			addSegment(cLineToAbs,x,y);
+		}
+
+        inline void lineToRel(float x,float y)  
+		{
+			addSegment(cLineToRel,x,y);
+		}
+
+        inline void horizontalLineToAbs(float x)
+		{
+			addSegment(cHorizontalLineToAbs,x);
+		}
+
+        inline void horizontalLineToRel(float x)
+		{
+			addSegment(cHorizontalLineToRel,x);
+		}
+
+        inline void verticalLineToAbs(float y)  
+		{
+			addSegment(cVerticalLineToAbs,y);
+		}
+
+        inline void verticalLineToRel(float y)  
+		{
+			addSegment(cVerticalLineToRel,y);
+		}
 
         // Draw a quadratic bezier curve to x,y using control points cx,cy
         inline void quadBezierToAbs(float x,float y,float cx,float cy)
@@ -250,7 +280,10 @@ namespace vpl
                                              points_(points){}
 		~Segment(){}
 
-		inline const Path::Segment* getSegment() { return segment_;}
+		inline const Path::Segment* getSegment() 
+		{ 
+			return segment_;
+		}
 
         inline vplUint getNumberOfPoints()
         {

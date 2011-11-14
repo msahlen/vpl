@@ -77,48 +77,57 @@ namespace vpl
 
             return *this;
         }
-        inline Vector& operator += (const Vector& rhs)
+        
+		inline Vector& operator += (const Vector& rhs)
         {
             x_ += rhs.x_;
             y_ += rhs.y_;
 
             return *this;
         }
-        inline Vector& operator *= (float f)
+        
+		inline Vector& operator *= (float f)
         {
             x_ *= f;
             y_ *= f;
 
             return *this;
         }
-        inline Vector& operator /= (float f)
+        
+		inline Vector& operator /= (float f)
         {
             x_ /= f;
             y_ /= f;
 
             return *this;
         }
-        inline Vector operator / (float f) const
+        
+		inline Vector operator / (float f) const
         {
             return Vector(x_/f,y_/f);
         }
-        inline Vector operator * (float f) const
+        
+		inline Vector operator * (float f) const
         {
             return Vector(x_*f,y_*f);
         }
-        inline Vector operator + (const Vector& rhs) const
+        
+		inline Vector operator + (const Vector& rhs) const
         {
             return Vector(x_ + rhs.x_,y_ + rhs.y_);
         }
-        inline Vector operator - (const Vector& rhs) const
+        
+		inline Vector operator - (const Vector& rhs) const
         {
             return Vector(x_ - rhs.x_,y_ - rhs.y_);
         }
-        inline bool operator == (const Vector &rhs) const
+        
+		inline bool operator == (const Vector &rhs) const
         {
             return (isEqual(x_,rhs.x_ ) && isEqual(y_, rhs.y_));
         }
-        inline bool operator != (const Vector &rhs) const
+        
+		inline bool operator != (const Vector &rhs) const
         {
             return !(Vector(x_,y_) == rhs);
         }

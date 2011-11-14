@@ -53,31 +53,38 @@ namespace vpl
         {
             color_ = color;
         }
-        inline void setOpacity(vplUchar alpha)
+        
+		inline void setOpacity(vplUchar alpha)
         {
             color_.setAlpha(alpha);
         }
-        inline void setGradient(const Gradient* gradient)
+        
+		inline void setGradient(const Gradient* gradient)
         {
             gradient_ = gradient;
         }
-        inline void setSize(float size)
+        
+		inline void setSize(float size)
         {
             size_ = size;
         }
-        inline void setMiterLimit(float limit)
+        
+		inline void setMiterLimit(float limit)
         {
             miterLimit_ = limit;
         }
-        inline void setEndType(Stroker::EndType endType)
+        
+		inline void setEndType(Stroker::EndType endType)
         {
             endType_ = endType;
         }
-        inline void setJoinType(Stroker::JoinType joinType)
+        
+		inline void setJoinType(Stroker::JoinType joinType)
         {
             joinType_ = joinType;
         }
-        inline void setBlendMode(BlendMode blendMode)
+        
+		inline void setBlendMode(BlendMode blendMode)
         {
             blendMode_ = blendMode;
         }
@@ -87,31 +94,38 @@ namespace vpl
         {
             return color_.getColorRGBA();
         }
-        inline vplUint32 getColorAsARGB() const
+        
+		inline vplUint32 getColorAsARGB() const
         {
             return color_.getColorARGB();
         }
-        inline const Gradient* getGradient() const
+        
+		inline const Gradient* getGradient() const
         {
             return gradient_;
         }
-        inline float getSize() const
+        
+		inline float getSize() const
         {
             return size_;
         }
-        inline float getMiterLimit() const
+        
+		inline float getMiterLimit() const
         {
             return miterLimit_;
         }
-        inline Stroker::EndType getEndType() const
+        
+		inline Stroker::EndType getEndType() const
         {
             return endType_;
         }
-        inline Stroker::JoinType getJoinType() const
+        
+		inline Stroker::JoinType getJoinType() const
         {
             return joinType_;
         }
-        inline BlendMode getBlendMode() const
+        
+		inline BlendMode getBlendMode() const
         {
             return blendMode_;
         }
@@ -147,19 +161,23 @@ namespace vpl
         {
             color_ = color;
         }
-        inline void setOpacity(vplUchar alpha)
+        
+		inline void setOpacity(vplUchar alpha)
         {
             color_.setAlpha(alpha);
         }
-        inline void setGradient( const Gradient* gradient)
+        
+		inline void setGradient( const Gradient* gradient)
         {
             gradient_ = gradient;
         }
-        inline void setBlendMode(BlendMode blendMode)
+        
+		inline void setBlendMode(BlendMode blendMode)
         {
             blendMode_ = blendMode;
         }
-        inline void setFillMode(FillMode fillMode)
+        
+		inline void setFillMode(FillMode fillMode)
         {
             fillMode_ = fillMode;
         }
@@ -169,20 +187,24 @@ namespace vpl
         {
             return color_.getColorRGBA();
         }
-        inline vplUint32 getColorAsARGB() const
+        
+		inline vplUint32 getColorAsARGB() const
         {
             return color_.getColorARGB();
         }
-        inline const Gradient* getGradient() const
+        
+		inline const Gradient* getGradient() const
         {
             return gradient_;
         }
-        inline BlendMode getBlendMode() const
+        
+		inline BlendMode getBlendMode() const
         {
             return blendMode_;
 
         }
-        inline FillMode getFillMode() const
+        
+		inline FillMode getFillMode() const
         {
             return fillMode_;
         }
