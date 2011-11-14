@@ -224,10 +224,12 @@ namespace vpl
         PixelBuffer();
         virtual ~PixelBuffer();
 
-        void initialize(vplUint width,vplUint height,vplUint pitch);
-        void initialize(vplUint width,vplUint height);
-        void clear();
-        void clear(const Color& color);
+        void initialize(vplUint width,
+			            vplUint height,
+						Alignment alignment = cNoAlignment);
+        
+		void clear();
+		void clear(const Color& color);
 
         inline vplUint getWidth() const
         {
@@ -247,11 +249,11 @@ namespace vpl
         }
         inline vplUint32* getBuffer()
         {
-            return buffer_;
+            return buffer_->getMemory();
         }
         inline const vplUint32* getBuffer() const
         {
-            return buffer_;
+			return buffer_->getMemory();
         }
 
     private:
@@ -259,7 +261,7 @@ namespace vpl
         vplUint width_;
         vplUint height_;
         vplUint pitch_;
-        vplUint32* buffer_;
+        DynamicMemory<vplUint32>* buffer_;
     };
 
 	// Forward declarations

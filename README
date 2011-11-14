@@ -1,11 +1,16 @@
 VPL 0.2
 
 VPL is a library to generate and manipulate vector paths as well as render them.
+The library is actually 2 libraries:
+
+base:
+Path and 2d math(2d vectors, affine matrices).
+Basic data structures and simple logging.
+
+render:
 The software renderer is based on: http://mlab.uiah.fi/~kkallio/antialiasing/  
-
-Basic data structures and a simple logging class are part of the base package.
-
 In order to build rendering examples SFML needs to be installed and set up correctly.
+The render part of the library can be disabled when configuring the source.
 
 There are some small optional optimizations done in SSE, they need MASM to be compiled.
 

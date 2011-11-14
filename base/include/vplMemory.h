@@ -150,7 +150,8 @@ namespace vpl
         
 		inline void clearAndResize(vplUint newSize)
         {
-            delete [] data_;
+			if(data_)
+				delete [] data_;
 
             alignedData_ = data_ = 0;
             size_ = newSize;

@@ -9,14 +9,26 @@ include_directories(../base/include)
 include_directories(include)
 include_directories(src)
 
-set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.cpp
+set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.h
+		       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.cpp
+		       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplColorHelper.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEvenOddMaskGenerator.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEvenOddMaskGenerator.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFill.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFill.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFixedPoint.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplHorizontalSpan.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMask.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMaskGenerator.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMaskGenerator.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplPixelBuffer.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplPixelCoverage.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplRender.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplRenderer.cpp
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplSampleMasks.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplScanLineList.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplScanLineList.cpp)
 
 

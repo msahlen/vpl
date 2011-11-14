@@ -18,42 +18,46 @@
 #include "vplRender.h"
 #include "vplColorHelper.h"
 
+static inline vplUint findNextPowerOf2(vplUint& i,vpl::Alignment alignment)
+{
+	if(i < static_cast<vplUint>(alignment))
+		i = alignment;
+
+  vplUint k = alignment;
+  
+  while (k < i)
+    k *= 2;
+
+  return k;
+}
+
 namespace vpl
 {
     PixelBuffer::PixelBuffer():width_(0),height_(0),pitch_(0),buffer_(0){}
-    PixelBuffer::~PixelBuffer()
-    {
-        if(buffer_)
-            delete [] buffer_;
-    }
+    PixelBuffer::~PixelBuffer(){}
 
-    void PixelBuffer::initialize(vplUint width,vplUint height)
+    void PixelBuffer::initialize(vplUint width,vplUint height,Alignment alignment)
     {
         if(buffer_)
-            delete [] buffer_;
+			delete buffer_;
 
         pitch_  = width;
         width_  = width;
         height_ = height;
-        buffer_ = new vplUint32[height_*pitch_];
 
-        memset(buffer_,0xff,sizeof(vplUint8)*pitch_*height_*4);
-    }
-    void PixelBuffer::initialize(vplUint width,vplUint height,vplUint pitch)
-    {
-        if(buffer_)
-            delete [] buffer_;
+		if(alignment != cNoAlignment)
+		{
+			pitch_ = findNextPowerOf2(width_,alignment);
+			buffer_ = new DynamicMemory<vplUint32>(height_*pitch_,alignment);
+		}
+		else
+			buffer_ = new DynamicMemory<vplUint32>(height_*pitch_);
 
-        pitch_  = pitch;
-        width_  = width;
-        height_ = height;
-        buffer_ = new vplUint32[height_*pitch_];
-
-        memset(buffer_,0x00,sizeof(vplUint8)*pitch_*height_*4);
+		memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
     }
     void PixelBuffer::clear()
     {
-        memset(buffer_,0x00,sizeof(vplUint8)*pitch_*height_*4);
+        memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
     }
     void PixelBuffer::clear(const Color& color)
     {
@@ -61,10 +65,10 @@ namespace vpl
 
         c = preMultiplyColorRGBA(c);
 
-        vplUint32* dest = reinterpret_cast<vplUint32*>(buffer_);
+		vplUint32* dest = buffer_->getMemory();
 
         // Duff it
-        vplUint count = sizeof(vplUint8)*pitch_*height_*4 / sizeof(vplUint32);
+        vplUint count = pitch_ * height_;
 
         register vplUint n = (count + 7) / 8;
 
