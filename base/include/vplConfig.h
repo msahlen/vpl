@@ -14,11 +14,13 @@
  * License along with this library;
  * if not, see <http://www.gnu.org/licenses/>.
  */
-
+ 
 #ifndef VPL_CONFIG_H_INCLUDED_
 #define VPL_CONFIG_H_INCLUDED_
 
-#include "vplGeneratedConfig.h"
+/* #undef USE_SSE_ */
+#define HAVE_STDINT_H
+/* #undef SSE_64_ */
 
 // Defines for calling conventions
 #ifdef USE_SSE_
@@ -88,3 +90,5 @@ typedef unsigned int  vplUint;
 typedef unsigned char vplUchar;
 
 #endif // VPL_CONFIG_H_INCLUDED_
+
+

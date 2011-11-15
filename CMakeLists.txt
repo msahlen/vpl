@@ -66,7 +66,6 @@ CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
 add_subdirectory(base)
 add_subdirectory(render)
 
-
 #############################################################################
 # Installation
 #############################################################################

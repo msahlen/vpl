@@ -75,9 +75,9 @@ endif(OPTION_SSE64)
 # Configure source
 ######################################################################
 
-# Generate configure file so that source knows wether to use SSE code
+# Generate configuration header
 configure_file(${CMAKE_SOURCE_DIR}/config.h.in
-               ${CMAKE_CURRENT_SOURCE_DIR}/include/vplGeneratedConfig.h)
+               ${CMAKE_CURRENT_SOURCE_DIR}/include/vplConfig.h)
 
 
 # Add include directories
@@ -145,23 +145,5 @@ endif(BUILD_STATIC_LIBS)
 ############################################################################
 
 add_subdirectory(examples)
-
-#############################################################################
-# Installation
-#############################################################################
-
-install(FILES ${VPL_HEADERS}  DESTINATION include COMPONENT headers)
-
-set(CPACK_PACKAGE_NAME "vpl")
-set(CPACK_PACKAGE_VENDOR "CMake.org")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "vpl - Vector Path Library")
-set(CPACK_PACKAGE_VERSION "0.1.0")
-set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "vpl")
-
-# This must always be last!
-include(CPack)
 
 
