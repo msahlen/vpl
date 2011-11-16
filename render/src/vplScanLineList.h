@@ -18,7 +18,6 @@
 #ifndef VPL_SCAN_LINE_LIST_H_INCLUDED_
 #define VPL_SCAN_LINE_LIST_H_INCLUDED_
 
-#include <climits>
 #include "vplArray.h"
 #include "vplConfig.h"
 #include "vplEdge.h"
@@ -45,17 +44,33 @@ namespace vpl
         // Edges inserted have scanlines in subpixels
         void insert(const Edge& edge);
 
-        // Return edges for this scanline
+        // Getters
         Edge* getLine(int line);
 
-        // Get min/max scan lines
-        inline int getMax() {return maxY_;}
-        inline int getMin() {return minY_;}
+        inline int getMax() 
+		{
+			return maxY_;
+		}
+        
+		inline int getMin() 
+		{
+			return minY_;
+		}
 
-		// Return number of edges
-		inline vplUint getNumberOfEdges()     { return edgeCount_; }
-        inline vplUint getNumberOfScanLines() { return numScanLines_;}
-        inline vplUint getNumberOfSubpixels() { return numSubPixels_;}
+		inline vplUint getNumberOfEdges()     
+		{
+			return edgeCount_; 
+		}
+        
+		inline vplUint getNumberOfScanLines() 
+		{ 
+			return numScanLines_;
+		}
+        
+		inline vplUint getNumberOfSubpixels() 
+		{ 
+			return numSubPixels_;
+		}
 
     private:
 

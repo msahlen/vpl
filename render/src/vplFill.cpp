@@ -105,18 +105,18 @@ namespace vpl
             }
         }
     }
-    void fillEvenOdd(PixelBuffer* target,ScanLineList* edges,
-                     BlendData& data,FillParameters& params,
+    void fillEvenOdd(BlendMode blendMode,PixelBuffer* target,ScanLineList* edges,
+                     vplUint32 color,FillParameters& params,
                      EvenOddMaskBuffer* evenOddMaskBuffer)
     {
-        switch(data.blendMode_)
+        switch(blendMode)
         {
             case cSrcOverDest:
             {
                 SrcOverDestBlender blender;
                 EvenOddFiller<SrcOverDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -126,7 +126,7 @@ namespace vpl
                 SrcBlender blender;
                 EvenOddFiller<SrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -136,7 +136,7 @@ namespace vpl
                 DestBlender blender;
                 EvenOddFiller<DestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -146,7 +146,7 @@ namespace vpl
                 DestOverSrcBlender blender;
                 EvenOddFiller<DestOverSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -156,7 +156,7 @@ namespace vpl
                 SrcInDestBlender blender;
                 EvenOddFiller<SrcInDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -166,7 +166,7 @@ namespace vpl
                 DestInSrcBlender blender;
                 EvenOddFiller<DestInSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -176,7 +176,7 @@ namespace vpl
                 ClearBlender blender;
                 EvenOddFiller<ClearBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -186,7 +186,7 @@ namespace vpl
                 SrcOutDestBlender blender;
                 EvenOddFiller<SrcOutDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -196,7 +196,7 @@ namespace vpl
                 DestOutSrcBlender blender;
                 EvenOddFiller<DestOutSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -206,7 +206,7 @@ namespace vpl
                 SrcAtopDestBlender blender;
                 EvenOddFiller<SrcAtopDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -216,7 +216,7 @@ namespace vpl
                 DestAtopSrcBlender blender;
                 EvenOddFiller<DestAtopSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -226,7 +226,7 @@ namespace vpl
                 SrcXorDestBlender blender;
                 EvenOddFiller<SrcXorDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -236,7 +236,7 @@ namespace vpl
                 SrcOverDestBlender blender;
                 EvenOddFiller<SrcOverDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -244,18 +244,19 @@ namespace vpl
         }
     }
 
-    void gradientFillEvenOdd(PixelBuffer* target,ScanLineList* edges,
-                             BlendData& data,FillParameters& params,
+    void gradientFillEvenOdd(BlendMode blendMode,PixelBuffer* target,
+							 ScanLineList* edges,Gradient* gradient,
+							 FillParameters& params,
                              EvenOddMaskBuffer* evenOddMaskBuffer)
     {
-        switch(data.blendMode_)
+        switch(blendMode)
         {
             case cSrcOverDest:
             {
                 SrcOverDestGradientBlender blender;
                 EvenOddFiller<SrcOverDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -265,7 +266,7 @@ namespace vpl
                 SrcGradientBlender blender;
                 EvenOddFiller<SrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -275,7 +276,7 @@ namespace vpl
                 DestGradientBlender blender;
                 EvenOddFiller<DestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -285,7 +286,7 @@ namespace vpl
                 DestOverSrcGradientBlender blender;
                 EvenOddFiller<DestOverSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -295,7 +296,7 @@ namespace vpl
                 SrcInDestGradientBlender blender;
                 EvenOddFiller<SrcInDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -305,7 +306,7 @@ namespace vpl
                 DestInSrcGradientBlender blender;
                 EvenOddFiller<DestInSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -315,7 +316,7 @@ namespace vpl
                 ClearBlender blender;
                 EvenOddFiller<ClearBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(0);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -325,7 +326,7 @@ namespace vpl
                 SrcOutDestGradientBlender blender;
                 EvenOddFiller<SrcOutDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -335,7 +336,7 @@ namespace vpl
                 DestOutSrcGradientBlender blender;
                 EvenOddFiller<DestOutSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -345,7 +346,7 @@ namespace vpl
                 SrcAtopDestGradientBlender blender;
                 EvenOddFiller<SrcAtopDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -355,7 +356,7 @@ namespace vpl
                 DestAtopSrcGradientBlender blender;
                 EvenOddFiller<DestAtopSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -365,7 +366,7 @@ namespace vpl
                 SrcXorDestGradientBlender blender;
                 EvenOddFiller<SrcXorDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -375,7 +376,7 @@ namespace vpl
                 SrcOverDestGradientBlender blender;
                 EvenOddFiller<SrcOverDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,evenOddMaskBuffer);
             }
@@ -383,18 +384,18 @@ namespace vpl
         }
     }
 
-    void fillNonZero(PixelBuffer* target,ScanLineList* edges,
-                    BlendData& data,FillParameters& params,
-                    NonZeroMaskBuffer* nonZeroMaskBuffer)
+    void fillNonZero(BlendMode blendMode,PixelBuffer* target,ScanLineList* edges,
+                     vplUint32 color,FillParameters& params,
+                     NonZeroMaskBuffer* nonZeroMaskBuffer)
     {
-        switch(data.blendMode_)
+        switch(blendMode)
         {
             case cSrcOverDest:
             {
                 SrcOverDestBlender blender;
                 NonZeroFiller<SrcOverDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -405,7 +406,7 @@ namespace vpl
                 SrcBlender blender;
                 NonZeroFiller<SrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -416,7 +417,7 @@ namespace vpl
                 DestBlender blender;
                 NonZeroFiller<DestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -427,7 +428,7 @@ namespace vpl
                 DestOverSrcBlender blender;
                 NonZeroFiller<DestOverSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -438,7 +439,7 @@ namespace vpl
                 SrcInDestBlender blender;
                 NonZeroFiller<SrcInDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -449,7 +450,7 @@ namespace vpl
                 DestInSrcBlender blender;
                 NonZeroFiller<DestInSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -460,7 +461,7 @@ namespace vpl
                 ClearBlender blender;
                 NonZeroFiller<ClearBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -471,7 +472,7 @@ namespace vpl
                 SrcOutDestBlender blender;
                 NonZeroFiller<SrcOutDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -482,7 +483,7 @@ namespace vpl
                 DestOutSrcBlender blender;
                 NonZeroFiller<DestOutSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -493,7 +494,7 @@ namespace vpl
                 SrcAtopDestBlender blender;
                 NonZeroFiller<SrcAtopDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -504,7 +505,7 @@ namespace vpl
                 DestAtopSrcBlender blender;
                 NonZeroFiller<DestAtopSrcBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -515,7 +516,7 @@ namespace vpl
                 SrcXorDestBlender blender;
                 NonZeroFiller<SrcXorDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -526,7 +527,7 @@ namespace vpl
                 SrcOverDestBlender blender;
                 NonZeroFiller<SrcOverDestBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(color);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
 
@@ -535,18 +536,19 @@ namespace vpl
         }
     }
 
-    void gradientFillNonZero(PixelBuffer* target,ScanLineList* edges,
-                                BlendData& data,FillParameters& params,
-                                NonZeroMaskBuffer* nonZeroMaskBuffer)
+    void gradientFillNonZero(BlendMode blendMode,PixelBuffer* target,
+		                     ScanLineList* edges,Gradient* gradient,
+							 FillParameters& params,
+                             NonZeroMaskBuffer* nonZeroMaskBuffer)
     {
-        switch(data.blendMode_)
+        switch(blendMode)
         {
             case cSrcOverDest:
             {
                 SrcOverDestGradientBlender blender;
                 NonZeroFiller<SrcOverDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -556,7 +558,7 @@ namespace vpl
                 SrcGradientBlender blender;
                 NonZeroFiller<SrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -566,7 +568,7 @@ namespace vpl
                 DestGradientBlender blender;
                 NonZeroFiller<DestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -576,7 +578,7 @@ namespace vpl
                 DestOverSrcGradientBlender blender;
                 NonZeroFiller<DestOverSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -586,7 +588,7 @@ namespace vpl
                 SrcInDestGradientBlender blender;
                 NonZeroFiller<SrcInDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -596,7 +598,7 @@ namespace vpl
                 DestInSrcGradientBlender blender;
                 NonZeroFiller<DestInSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -606,7 +608,7 @@ namespace vpl
                 ClearBlender blender;
                 NonZeroFiller<ClearBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setColor(0);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -616,7 +618,7 @@ namespace vpl
                 SrcOutDestGradientBlender blender;
                 NonZeroFiller<SrcOutDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -626,7 +628,7 @@ namespace vpl
                 DestOutSrcGradientBlender blender;
                 NonZeroFiller<DestOutSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);;
             }
@@ -636,7 +638,7 @@ namespace vpl
                 SrcAtopDestGradientBlender blender;
                 NonZeroFiller<SrcAtopDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -646,7 +648,7 @@ namespace vpl
                 DestAtopSrcGradientBlender blender;
                 NonZeroFiller<DestAtopSrcGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -656,7 +658,7 @@ namespace vpl
                 SrcXorDestGradientBlender blender;
                 NonZeroFiller<SrcXorDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }
@@ -666,7 +668,7 @@ namespace vpl
                 SrcOverDestGradientBlender blender;
                 NonZeroFiller<SrcOverDestGradientBlender> filler;
 
-                blender.setBlendData(&data);
+                blender.setGradient(gradient);
 
                 filler.fill(target,edges,blender,params,nonZeroMaskBuffer);
             }

@@ -34,20 +34,56 @@ namespace vpl
         {
             return FixedPoint(cFixedRaw,fixed_ + a.fixed_);
         }
-        inline FixedPoint operator -(const FixedPoint& a) const
+        
+		inline FixedPoint operator -(const FixedPoint& a) const
         {
             return FixedPoint(cFixedRaw,fixed_ - a.fixed_);
         }
-        inline FixedPoint& operator +=(FixedPoint a) { return *this = *this + a;}
-        inline bool operator ==(const FixedPoint& a) const { return fixed_ == a.fixed_; }
-        inline bool operator !=(const FixedPoint& a) const { return fixed_ != a.fixed_; }
-        inline bool operator <=(const FixedPoint& a) const { return fixed_ <= a.fixed_; }
-        inline bool operator >=(const FixedPoint& a) const { return fixed_ >= a.fixed_; }
-        inline bool operator  <(const FixedPoint& a) const { return fixed_< a.fixed_; }
-        inline bool operator  >(const FixedPoint& a) const { return fixed_  > a.fixed_; }
+        
+		inline FixedPoint& operator +=(FixedPoint a) 
+		{ 
+			return *this = *this + a;
+		}
+        
+		inline bool operator ==(const FixedPoint& a) const 
+		{ 
+			return fixed_ == a.fixed_; 
+		}
+        
+		inline bool operator !=(const FixedPoint& a) const 
+		{ 
+			return fixed_ != a.fixed_; 
+		}
+        
+		inline bool operator <=(const FixedPoint& a) const 
+		{ 
+			return fixed_ <= a.fixed_; 
+		}
+        
+		inline bool operator >=(const FixedPoint& a) const 
+		{ 
+			return fixed_ >= a.fixed_; 
+		}
+        
+		inline bool operator  <(const FixedPoint& a) const 
+		{ 
+			return fixed_< a.fixed_; 
+		}
+        
+		inline bool operator  >(const FixedPoint& a) const 
+		{ 
+			return fixed_  > a.fixed_; 
+		}
 
-        inline float toFloat() const {return fixed_ * step();}
-        inline int toInt()     const {return fixed_ >> cLowBits;}
+        inline float toFloat() const 
+		{
+			return fixed_ * step();
+		}
+        
+		inline int toInt()     const 
+		{
+			return fixed_ >> cLowBits;
+		}
 
     private:
 
@@ -62,7 +98,6 @@ namespace vpl
         // Private constructor
         enum FixedPointRaw { cFixedRaw };
         FixedPoint(FixedPointRaw, int fixed) : fixed_(fixed) {}
-
     };
 }
 

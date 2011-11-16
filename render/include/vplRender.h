@@ -59,7 +59,7 @@ namespace vpl
             color_.setAlpha(alpha);
         }
         
-		inline void setGradient(const Gradient* gradient)
+		inline void setGradient(Gradient* gradient)
         {
             gradient_ = gradient;
         }
@@ -100,7 +100,7 @@ namespace vpl
             return color_.getColorARGB();
         }
         
-		inline const Gradient* getGradient() const
+		inline Gradient* getGradient() const
         {
             return gradient_;
         }
@@ -133,7 +133,7 @@ namespace vpl
     private:
 
         Color color_;
-        const Gradient* gradient_;
+        Gradient* gradient_;
         float size_;
         float miterLimit_;
         Stroker::EndType endType_;
@@ -167,7 +167,7 @@ namespace vpl
             color_.setAlpha(alpha);
         }
         
-		inline void setGradient( const Gradient* gradient)
+		inline void setGradient(Gradient* gradient)
         {
             gradient_ = gradient;
         }
@@ -193,7 +193,7 @@ namespace vpl
             return color_.getColorARGB();
         }
         
-		inline const Gradient* getGradient() const
+		inline Gradient* getGradient() const
         {
             return gradient_;
         }
@@ -212,7 +212,7 @@ namespace vpl
    private:
 
         Color color_;
-        const Gradient* gradient_;
+        Gradient* gradient_;
         FillMode fillMode_;
         BlendMode blendMode_;
     };
@@ -269,7 +269,6 @@ namespace vpl
 	class VPL_API ScanLineList;
     class VPL_API EdgeGenerator;
 	class VPL_API NonZeroMaskBuffer;
-    struct VPL_API BlendData;
     struct VPL_API EvenOddMaskBuffer;
     struct VPL_API FillParameters;
 
@@ -305,18 +304,24 @@ namespace vpl
 
 			void initialize();
 			void updatePathEdges();
-            void fill(Brush::FillMode fillMode,BlendData& data,ScanLineList* scanLines);
-            void drawNewEdges();
+            void fill(BlendMode blendMode,Brush::FillMode fillMode,
+				      vplUint32 color,Gradient* gradient,
+					  ScanLineList* scanLines);
+            
+			void drawNewEdges();
             PathReference* allocateReference(const Path* path,
                                              const Pen* pen,
 								             const Brush* brush);
+			
 			void deAllocateReference(PathReference* reference);
 			void generateEdges(PathReference* reference);
-			void setGradientData(BlendData& data,const Gradient* gradient);
-
+			
+			// Dimensions of backbuffer
 			vplUint width_;
             vplUint height_;
+			// This is dependant on the sampling type used
             vplUint32 maxCoverage_;
+			// The backbuffer
             PixelBuffer* target_;
             EdgeGenerator* edgeGenerator_;
             EvenOddMaskBuffer* evenOddMaskBuffer_;
