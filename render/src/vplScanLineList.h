@@ -18,6 +18,7 @@
 #ifndef VPL_SCAN_LINE_LIST_H_INCLUDED_
 #define VPL_SCAN_LINE_LIST_H_INCLUDED_
 
+#include <climits>
 #include "vplArray.h"
 #include "vplConfig.h"
 #include "vplEdge.h"

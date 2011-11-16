@@ -122,7 +122,7 @@ namespace vpl
             if(alignment_ )
             {
                 T* newData        = new T[size_ + alignment_];
-                T* newAlignedData = (T*)(vplUint(newData + alignment_) & ~alignment_);
+                T* newAlignedData = (T*)(size_t(newData + alignment_) & ~alignment_);
 
                 std::memcpy(newAlignedData,alignedData_,oldSize*sizeof(T));
 
@@ -167,7 +167,7 @@ namespace vpl
         void align()
         {
             T* newData        = new T[size_ + alignment_];
-            T* newAlignedData = (T*)(vplUint(newData + alignment_) & ~alignment_);
+            T* newAlignedData = (T*)(size_t(newData + alignment_) & ~alignment_);
 
             if(data_)
                 delete [] data_;
