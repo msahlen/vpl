@@ -75,7 +75,6 @@ namespace vpl
     public:
 
         EvenOddFiller(){}
-
         ~EvenOddFiller(){}
 
         void fill(PixelBuffer* target,
@@ -264,7 +263,6 @@ namespace vpl
         public:
 
             NonZeroFiller(){}
-
             ~NonZeroFiller(){}
 
 

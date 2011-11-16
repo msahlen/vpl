@@ -10,7 +10,6 @@ include_directories(include)
 include_directories(src)
 
 set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.h
-		       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.cpp
 		       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplColorHelper.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.cpp
