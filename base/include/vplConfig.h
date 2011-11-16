@@ -89,6 +89,6 @@ typedef unsigned __int64 vplUint64;
 typedef unsigned int  vplUint;
 typedef unsigned char vplUchar;
 
-#endif// VPL_CONFIG_H_INCLUDED_
+#endif // VPL_CONFIG_H_INCLUDED_
 
 

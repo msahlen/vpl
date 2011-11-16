@@ -10,7 +10,7 @@ include_directories(include)
 include_directories(src)
 
 set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.h
-		       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplColorHelper.h
+		               ${CMAKE_CURRENT_SOURCE_DIR}/src/vplColorHelper.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEdgeGenerator.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplEvenOddMaskGenerator.h
@@ -18,6 +18,7 @@ set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFill.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFill.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplFixedPoint.h
+					   ${CMAKE_CURRENT_SOURCE_DIR}/src/vplGradient.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplHorizontalSpan.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMask.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMaskGenerator.h
