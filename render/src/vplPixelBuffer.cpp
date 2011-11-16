@@ -36,6 +36,7 @@ namespace vpl
     PixelBuffer::PixelBuffer():width_(0),height_(0),pitch_(0),buffer_(0){}
     PixelBuffer::~PixelBuffer(){}
 
+	// Initialize the pixelbuffer, and set pitch according to alignment requirements
     void PixelBuffer::initialize(vplUint width,vplUint height,Alignment alignment)
     {
         if(buffer_)
@@ -55,11 +56,13 @@ namespace vpl
 
 		memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
     }
+
     void PixelBuffer::clear()
     {
         memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
     }
-    void PixelBuffer::clear(const Color& color)
+    
+	void PixelBuffer::clear(const Color& color)
     {
         vplUint32 c = color.getColorRGBA();
 
