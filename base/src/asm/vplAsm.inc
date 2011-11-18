@@ -15,7 +15,16 @@
 %define ARG3 r8
 %define ARG4 r9
 
-%imacro enterFunction
+%else
+
+%define ARG1 rdi
+%define ARG2 rsi
+%define ARG3 rdx
+%define ARG4 rcx
+
+%endif
+
+%imacro enterFunction 0
 	push	rbp
 	mov	rax,rsp		    ; rax = original rbp
 	sub	rsp, byte 4
@@ -25,18 +34,10 @@
 	lea	rsp, [rbp - 32] ; assign the frame pointer with a bias of 32
 %endmacro
 
-%imacro leaveFunction
+%imacro leaveFunction 0
 	mov	rsp,rbp ; rsp <- aligned rbp
 	pop	rsp		; rsp <- original rbp
 	pop	rbp
 	ret
 %endmacro
 
-%else
-
-%define ARG1 rdi
-%define ARG2 rsi
-%define ARG3 rdx
-%define ARG4 rcx
-
-%endif

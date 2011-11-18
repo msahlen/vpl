@@ -18,9 +18,9 @@
 #ifndef VPL_CONFIG_H_INCLUDED_
 #define VPL_CONFIG_H_INCLUDED_
 
-/* #undef USE_SSE_ */
+#define USE_SSE_
 #define HAVE_STDINT_H
-/* #undef SSE_64_ */
+#define SSE_64_
 
 // Defines for calling conventions
 #ifdef USE_SSE_

@@ -13,52 +13,41 @@ global blendSrc
  
 blendSrc:
 
-      ; Get arguments
-      enter 0,0
-      push eax
-      push ebx
-      push ecx
-      mov eax, [ebp + 8]  ; dst pointer in eax
-      mov ebx, [ebp + 12] ; color pointer in ebx
-      mov ecx, [ebp + 16] ; number of pixels in ecx
+      enterFunction
 
       ; Load data
-      movaps xmm0,[ebx]  ; xmm0 = color color color color 
+      movaps xmm0,[ARG2]  ; xmm0 = color color color color 
 
 doFour:
-      movaps [eax],xmm0  ; Write result
+      movaps [ARG1],xmm0  ; Write result
 
       ;Increase address, decrease remaining pixels
-      sub ecx, 4
-      add eax, 16
+      sub ARG3, 4
+      add ARG1, 16
 
       ; Loop ?
-      cmp ecx,0x4
+      cmp ARG3,0x4
       jge doFour
 
-	  cmp ecx,0x1
+	  cmp ARG3,0x1
       jle doOne
 
 doTwo:
-	  movq [eax],xmm0  ; Write result
+	  movq [ARG1],xmm0  ; Write result
 
       ;Increase address, decrease remaining pixels
-      sub ecx, 2
-      add eax, 8
+      sub ARG3, 2
+      add ARG1, 8
      
 doOne:
-	  cmp ecx,0x0
+	  cmp ARG3,0x0
 	  je blendEnd
 	  
-	  mov ecx,[ebx]
-	  mov [eax],ecx
+	  mov ARG3,[ARG2]
+	  mov [ARG1],ARG3
 
 blendEnd:
 
-      pop eax
-      pop ebx
-      pop ecx
-      leave
-      ret
+      leaveFunction
 
 section	.data
