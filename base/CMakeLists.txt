@@ -1,75 +1,33 @@
 ######################################################################
-# Conditional SSE support
+# Configure nasm?
 ######################################################################
 
-if(OPTION_SSE32)
-
+if(OPTION_SSE32 OR OPTION_SSE64)
+  
   if(NASM_EXECUTABLE)
-    message(STATUS "Configuring 32 bit SSE optimizations")
-    set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplAsm32.asm)
-
-    if(MSVC)
-      message(STATUS "Making nasm code compatible with 32 bit msvc compiler")
-      set(ASM_OBJECT ${CMAKE_CURRENT_BINARY_DIR}/vplAsm.obj)
-      set(NASM_FORMAT -f win32)
-      set(NASM_OPTIONS --prefix _)
-    endif(MSVC)
-
-    if(CMAKE_COMPILER_IS_GNUCXX)
-      message(STATUS "Making nasm code compatible with 32 bit g++")
-      set(ASM_OBJECT ${CMAKE_CURRENT_BINARY_DIR}/vplAsm.o)
-      set(NASM_FORMAT -f elf)
-      set(NASM_OPTIONS)
-    endif(CMAKE_COMPILER_IS_GNUCXX)
-
-    add_custom_command(
-      OUTPUT ${ASM_OBJECT}
-      COMMAND ${NASM_EXECUTABLE}
-      ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
-      DEPENDS ${ASM_SOURCE}
-    )
-  else(NASM_EXECUTABLE)
-
-     message(STATUS "Not compiling 32 bit SSE optimizations due to nasm not being found")
-
-  endif(NASM_EXECUTABLE)
-
-endif(OPTION_SSE32)
-
-if(OPTION_SSE64)
-
-  if(NASM_EXECUTABLE)
-    message(STATUS "Configuring 64 bit SSE optimizations")
-    set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplAsm64.asm)
     set(USE_SSE_ 1)
-    set(SSE_64_ 1)
-
-    if(MSVC)
-      message(STATUS "Making nasm code compatible with 64 bit msvc compiler")
-      set(ASM_OBJECT ${CMAKE_CURRENT_BINARY_DIR}/vplAsm64.obj)
-      set(NASM_FORMAT -f win64 -DWIN64)
-    endif(MSVC)
-
-    if(CMAKE_COMPILER_IS_GNUCXX)
-      message(STATUS "Making nasm code compatible with 64 bit g++")
-      set(ASM_OBJECT ${CMAKE_CURRENT_BINARY_DIR}/vplAsm64.o)
-      set(NASM_FORMAT -f elf64)
-      set(NASM_OPTIONS)
-    endif(CMAKE_COMPILER_IS_GNUCXX)
-
-    add_custom_command(
-      OUTPUT ${ASM_OBJECT}
-      COMMAND ${NASM_EXECUTABLE}
-      ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
-      DEPENDS ${ASM_SOURCE}
-    )
+    
+    set(BASE_NAME vplAsm)
+    	
+    if(OPTION_SSE64)
+       set(SSE_64_ 1)
+       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm64.asm)
+    else(OPTION_SSE64)
+       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm32.asm)
+    endif(OPTION_SSE64)   
+  
+  include(src/asm/CMakeLists.txt)
+  
   else(NASM_EXECUTABLE)
-
-     message(STATUS "Not compiling 64 bit SSE optimizations due to nasm not being found")
-
+     message(STATUS "Not compiling SSE2 optimizations since we could'nt find nasm")  
   endif(NASM_EXECUTABLE)
 
-endif(OPTION_SSE64)
+  add_custom_command( OUTPUT ${ASM_OBJECT}
+                      COMMAND ${NASM_EXECUTABLE}
+                      ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
+                      DEPENDS ${ASM_SOURCE} )
+                      
+endif(OPTION_SSE32 OR OPTION_SSE64)  
 
 ######################################################################
 # Configure source
@@ -78,7 +36,6 @@ endif(OPTION_SSE64)
 # Generate configuration header
 configure_file(${CMAKE_SOURCE_DIR}/config.h.in
                ${CMAKE_CURRENT_SOURCE_DIR}/include/vplConfig.h)
-
 
 # Add include directories
 include_directories(include)
@@ -143,7 +100,6 @@ endif(BUILD_STATIC_LIBS)
 #############################################################################
 # Examples
 ############################################################################
-
 add_subdirectory(examples)
 
 

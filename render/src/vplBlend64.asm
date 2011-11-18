@@ -1,3 +1,5 @@
+%include "vplAsm.inc"
+
 section	.text
 
 ; Exported functions
