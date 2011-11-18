@@ -40,11 +40,13 @@ namespace vpl
 
         ~Color(){}
 
+        // Setters
         inline void setAlpha(vplUchar alpha) {alpha_ = alpha;}
         inline void setRed(vplUchar red)     {red_   = red;}
         inline void setGreen(vplUchar green) {green_ = green;}
         inline void setBlue(vplUchar blue)   {blue_  = blue;}
 
+        // Getters
         inline vplUint32 getColorRGBA() const
         {
             return ((alpha_ << 24)|(blue_ << 16)|(green_ << 8)|red_);
@@ -208,6 +210,7 @@ namespace vpl
     static const Color cYellow = Color(255,255,255,0);
     static const Color cYellowGreen = Color(255,154,205,50);
 
+    // Color format conversion
     inline vplUint32 ARGBtoRGBA(vplUint32 argb)
     {
         return

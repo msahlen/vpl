@@ -54,11 +54,21 @@ namespace vpl
         }
 
         // Return number of elements in array
-        inline vplUint getItemCount() const {return itemCount_;}
+        inline vplUint getItemCount() const 
+		{
+			return itemCount_;
+		}
 
         // Return last element
-        inline T& getLast()             {return memory_->getAt(itemCount_ - 1);}
-		inline const T& getLast() const {return memory_->getAt(itemCount_ - 1);}
+        inline T& getLast()             
+		{
+			return memory_->getAt(itemCount_ - 1);
+		}
+
+		inline const T& getLast() const 
+		{
+			return memory_->getAt(itemCount_ - 1);
+		}
 
         // Remove last element
         inline void removeLast()
@@ -68,12 +78,26 @@ namespace vpl
         }
 
         // Access elements, no bounds checking
-        inline T& operator[](vplUint i)             {return memory_->getAt(i);}
-		inline const T& operator[](vplUint i) const {return memory_->getAt(i);}
+        inline T& operator[](vplUint i)             
+		{
+			return memory_->getAt(i);
+		}
+
+		inline const T& operator[](vplUint i) const 
+		{
+			return memory_->getAt(i);
+		}
 
         // Return a pointer to the start of the data
-        inline T* getContents()             {return memory_->getMemory();}
-		inline const T* getContents() const {return memory_->getMemory();}
+        inline T* getContents()             
+		{
+			return memory_->getMemory();
+		}
+
+		inline const T* getContents() const 
+		{
+			return memory_->getMemory();
+		}
 
         // Clear the content of the array
         inline void clear() {itemCount_ = 0;}
@@ -105,4 +129,5 @@ namespace vpl
         DynamicMemory<T>* memory_;
     };
 }
+
 #endif

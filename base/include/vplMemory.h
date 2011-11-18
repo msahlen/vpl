@@ -19,7 +19,6 @@
 #define VPL_MEMORY_H_INCLUDED_
 
 #include <cstring>
-#include <cstddef>
 
 #include "vplConfig.h"
 
@@ -72,13 +71,40 @@ namespace vpl
 			alignedData_ = data_ = 0;
         }
 
-        inline T* getMemory()                       { return alignedData_;}
-        inline const T* getMemory() const           { return alignedData_;}
-        inline vplUint getSize() const              { return size_;}
-        inline T& operator[](vplUint i)             { return alignedData_[i];}
-        inline const T& operator[](vplUint i) const { return alignedData_[i];}
-        inline T& getAt(vplUint i)                  { return alignedData_[i];}
-        inline const T& getAt(vplUint i) const      { return alignedData_[i];}
+        inline T* getMemory()                       
+		{ 
+			return alignedData_;
+		}
+
+        inline const T* getMemory() const           
+		{ 
+			return alignedData_;
+		}
+        
+		inline vplUint getSize() const              
+		{ 
+			return size_;
+		}
+        
+		inline T& operator[](vplUint i)             
+		{ 
+			return alignedData_[i];
+		}
+        
+		inline const T& operator[](vplUint i) const 
+		{ 
+			return alignedData_[i];
+		}
+        
+		inline T& getAt(vplUint i)                  
+		{ 
+			return alignedData_[i];
+		}
+        
+		inline const T& getAt(vplUint i) const      
+		{ 
+			return alignedData_[i];
+		}
 
         // Align data
         void align(Alignment alignment)
@@ -96,7 +122,7 @@ namespace vpl
             if(alignment_ )
             {
                 T* newData        = new T[size_ + alignment_];
-                T* newAlignedData = (T*)(std::ptrdiff_t(newData + alignment_) & ~alignment_);
+                T* newAlignedData = (T*)(vplUint(newData + alignment_) & ~alignment_);
 
                 std::memcpy(newAlignedData,alignedData_,oldSize*sizeof(T));
 
@@ -116,10 +142,16 @@ namespace vpl
                 data_ = alignedData_ = newData;
             }
         }
-        inline void reAllocate(){reAllocate(size_*2);}
-        inline void clearAndResize(vplUint newSize)
+        
+		inline void reAllocate()
+		{
+			reAllocate(size_*2);
+		}
+        
+		inline void clearAndResize(vplUint newSize)
         {
-            delete [] data_;
+			if(data_)
+				delete [] data_;
 
             alignedData_ = data_ = 0;
             size_ = newSize;
@@ -135,7 +167,7 @@ namespace vpl
         void align()
         {
             T* newData        = new T[size_ + alignment_];
-            T* newAlignedData = (T*)(std::ptrdiff_t(newData + alignment_) & ~alignment_);
+            T* newAlignedData = (T*)(vplUint(newData + alignment_) & ~alignment_);
 
             if(data_)
                 delete [] data_;
@@ -145,7 +177,7 @@ namespace vpl
         }
 
         vplUint size_;
-        std::ptrdiff_t alignment_;
+        vplUint alignment_;
         T* alignedData_;
         T* data_;
     };

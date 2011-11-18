@@ -66,7 +66,6 @@ CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
 add_subdirectory(base)
 add_subdirectory(render)
 
-
 #############################################################################
 # Installation
 #############################################################################
@@ -76,9 +75,9 @@ install(FILES ${VPL_HEADERS} ${VPL_RENDER_HEADERS}  DESTINATION include COMPONEN
 set(CPACK_PACKAGE_NAME "vpl")
 set(CPACK_PACKAGE_VENDOR "CMake.org")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "vpl - Vector Path Library")
-set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_PACKAGE_VERSION "0.2.0")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "2")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "vpl")
 

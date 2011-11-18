@@ -48,8 +48,8 @@
 // Macros for debugging, will only be compiled in debug release
 #ifdef _DEBUG
 
-#define FILE_DEBUG_(f) if (0) ; else vpl::Log(f,vpl::Log::cLogLevelDebug)
-#define STD_DEBUG_() if (0) ; else vpl::Log(vpl::Log::cLogLevelDebug)
+#define FILE_DEBUG(f) if (0) ; else vpl::Log(f,vpl::Log::cLogLevelDebug)
+#define STD_DEBUG() if (0) ; else vpl::Log(vpl::Log::cLogLevelDebug)
 
 #else
 
@@ -62,7 +62,7 @@
 namespace vpl
 {
 	class VPL_API Log
-	{   
+	{
     public:
         // Logging levels
         enum LogLevel
@@ -91,7 +91,7 @@ namespace vpl
         Log& operator << (const vplUint64 i);
 
 		static LogLevel& logLevel();
-		
+
    private:
 
         String log_;

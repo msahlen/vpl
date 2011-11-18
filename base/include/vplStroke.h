@@ -49,13 +49,36 @@ namespace vpl
 
             void generateStrokeOutlines(SubPath* subPath,
                                         const AffineMatrix& transform);
+			// Getters
+            inline DynamicArray<float>& getOuterArray() 
+			{ 
+				return outerPoints_;
+			}
 
-            inline DynamicArray<float>& getOuterArray() { return outerPoints_;}
-            inline DynamicArray<float>& getInnerArray() { return innerPoints_;}
-            inline float* getOuterPoints()              { return outerPoints_.getContents();}
-            inline float* getInnerPoints()              { return innerPoints_.getContents();}
-            inline vplUint getNumberOfOuterPoints()     { return outerPoints_.getItemCount()/2;}
-            inline vplUint getNumberOfInnerPoints()     { return innerPoints_.getItemCount()/2;}
+            inline DynamicArray<float>& getInnerArray() 
+			{ 
+				return innerPoints_;
+			}
+            
+			inline float* getOuterPoints()              
+			{ 
+				return outerPoints_.getContents();
+			}
+            
+			inline float* getInnerPoints()              
+			{ 
+				return innerPoints_.getContents();
+			}
+            
+			inline vplUint getNumberOfOuterPoints()     
+			{ 
+				return outerPoints_.getItemCount()/2;
+			}
+            
+			inline vplUint getNumberOfInnerPoints()     
+			{ 
+				return innerPoints_.getItemCount()/2;
+			}
 
         private:
 
