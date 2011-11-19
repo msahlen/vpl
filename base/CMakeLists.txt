@@ -3,31 +3,31 @@
 ######################################################################
 
 if(OPTION_SSE32 OR OPTION_SSE64)
-  
+
   if(NASM_EXECUTABLE)
     set(USE_SSE_ 1)
-    
+
     set(BASE_NAME vplAsm)
-    	
+
     if(OPTION_SSE64)
        set(SSE_64_ 1)
        set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm64.asm)
     else(OPTION_SSE64)
        set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm32.asm)
-    endif(OPTION_SSE64)   
-  
+    endif(OPTION_SSE64)
+
   include(src/asm/CMakeLists.txt)
-  
+
   else(NASM_EXECUTABLE)
-     message(STATUS "Not compiling SSE2 optimizations since we could'nt find nasm")  
+     message(STATUS "Not compiling SSE2 optimizations since we could'nt find nasm")
   endif(NASM_EXECUTABLE)
 
   add_custom_command( OUTPUT ${ASM_OBJECT}
                       COMMAND ${NASM_EXECUTABLE}
                       ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
                       DEPENDS ${ASM_SOURCE} )
-                      
-endif(OPTION_SSE32 OR OPTION_SSE64)  
+
+endif(OPTION_SSE32 OR OPTION_SSE64)
 
 ######################################################################
 # Configure source

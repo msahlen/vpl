@@ -3,13 +3,13 @@
 section	.text
 
 ; Exported functions
-global transformSSE
+global batchTransform
 global estimateFlatness
 
-; function transformSSE
+; function batchTransform
 ; transform an array of vectors
 ; C prototype;
-; void transformSSE(float* transform,float* vectors,unsigned int numVectors)
+; void batchTransform(float* transform,float* vectors,unsigned int numVectors)
 
 ; Matrix layout
 ; SX  transform[0]
@@ -22,7 +22,7 @@ global estimateFlatness
 ;new_x = x * SX  + y_ * SHX + TX;
 ;new_y = x * SHY + y_ * SY  + TY;
 
-transformSSE:
+batchTransform:
 
 	  enterFunction
 
