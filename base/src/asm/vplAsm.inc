@@ -1,3 +1,19 @@
+;VPL - Vector path library
+;Copyright (C) 2009 - 2011 Mattias Sahlén <Mattias Sahlén <mattias.sahlen@gmail.com>>
+;This library is free software; you can redistribute it and/or
+;modify it under the terms of the GNU General General Public
+;License as published by the Free Software Foundation; either
+;version 2.1 of the License, or (at your option) any later version.
+
+;This library is distributed in the hope that it will be useful,
+;but WITHOUT ANY WARRANTY; without even the implied warranty of
+;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;General General Public License for more details.
+
+;You should have received a copy of the GNU General General Public
+;License along with this library;
+;if not, see <http://www.gnu.org/licenses/>.
+
 ; Calling convention for Windows 64bit:
 ; The registers RCX, RDX, R8, R9 are used for integer and pointer arguments (in that order left to right),
 ; and XMM0, XMM1, XMM2, XMM3 are used for floating point arguments
@@ -8,21 +24,7 @@
 ; For system calls, R10 is used instead of RCX.[9] As in the Microsoft x64 calling convention,
 ; additional arguments are pushed onto the stack and the return value is stored in RAX.
 
-%ifdef WIN64
-
-%define ARG1 rcx
-%define ARG2 rdx
-%define ARG3 r8
-%define ARG4 r9
-
-%else
-
-%define ARG1 rdi
-%define ARG2 rsi
-%define ARG3 rdx
-%define ARG4 rcx
-
-%endif
+%ifdef SSE64
 
 %imacro enterFunction 0
 	push	rbp
@@ -40,4 +42,46 @@
 	pop	rbp
 	ret
 %endmacro
+
+%ifdef WIN64
+
+%define ARG1 rcx
+%define ARG2 rdx
+%define ARG3 r8
+%define ARG4 r9
+
+%else
+
+%define ARG1 rdi
+%define ARG2 rsi
+%define ARG3 rdx
+%define ARG4 rcx
+
+%endif 
+
+%else 
+
+%define ARG1 eax
+%define ARG2 ebx
+%define ARG3 ecx
+
+%imacro enterFunction 0
+      enter 0,0
+      push eax
+      push ebx
+      push ecx
+      mov eax, [ebp + 8]     
+      mov ebx, [ebp + 12]    
+      mov ecx, [ebp + 16]
+%endmacro
+
+%imacro leaveFunction 0
+	  pop eax
+      pop ebx
+      pop ecx
+      leave
+      ret	 
+%endmacro
+	        
+%endif
 

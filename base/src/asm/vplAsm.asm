@@ -1,3 +1,21 @@
+;VPL - Vector path library
+;Copyright (C) 2009 - 2011 Mattias Sahlén <Mattias Sahlén <mattias.sahlen@gmail.com>>
+;This library is free software; you can redistribute it and/or
+;modify it under the terms of the GNU General General Public
+;License as published by the Free Software Foundation; either
+;version 2.1 of the License, or (at your option) any later version.
+
+;This library is distributed in the hope that it will be useful,
+;but WITHOUT ANY WARRANTY; without even the implied warranty of
+;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;General General Public License for more details.
+
+;You should have received a copy of the GNU General General Public
+;License along with this library;
+;if not, see <http://www.gnu.org/licenses/>.
+
+%include "vplAsm.inc"
+
 section	.text
 
 ; Exported functions
@@ -22,19 +40,17 @@ global estimateFlatness
 
 batchTransform:
 
-      ; Get arguments
-      enter 0,0
-      push eax
-      push ebx
-      push ecx
-      mov eax, [ebp + 8]      ;matrix pointer in eax
-      mov ebx, [ebp + 12]     ;vector pointer in ebx
-      mov ecx, [ebp + 16]     ;number of vectors in ecx
+	  enterFunction
+
+	  ; Arguments:
+      ; matrix pointer in ARG1
+      ; vector pointer in ARG2
+      ; number of vectors in ARG3
 
       ; Load matrix and shuffle data
-      movaps xmm1,[eax + 16]  ; xmm1 = 0   0  TY  SY
-      movaps xmm0,[eax]       ; xmm0 = SHY TX SHX SX
-      movaps xmm2,xmm1        ; xmm2 = 0   0  TY  SY
+      movaps xmm1,[ARG1 + 16]  ; xmm1 = 0   0  TY  SY
+      movaps xmm0,[ARG1]       ; xmm0 = SHY TX SHX SX
+      movaps xmm2,xmm1         ; xmm2 = 0   0  TY  SY
 
       shufps xmm1,xmm0,0x0    ; xmm1 = SX  SX  SY  SY
       shufps xmm2,xmm0,0xA5   ; xmm2 = TX  TX  TY  TY
@@ -43,13 +59,13 @@ batchTransform:
       shufps xmm0,xmm0,0xdd   ; xmm0 = SHY SHX SHY SHX
 
       ; If only one vector
-      cmp ecx,0x1
+      cmp ARG3,0x1
       jl doOne
 
       ;Load two vectors
 doTwo:
-      movaps xmm4, [ebx]      ; xmm4 = y2 x2 y1 x1
-      movaps xmm5, [ebx]      ; xmm5 = y2 x2 y1 x1
+      movaps xmm4, [ARG2]      ; xmm4 = y2 x2 y1 x1
+      movaps xmm5, [ARG2]      ; xmm5 = y2 x2 y1 x1
 
       ;Reorder one vector
       shufps xmm5,xmm5,0xB1   ; xmm5 = x2 y2 x1 y1
@@ -59,23 +75,23 @@ doTwo:
       mulps xmm5,xmm0         ; xmm5 = x2*SHY y2*SHX x1*SHY y1*SHX
       addps xmm4,xmm5         ; xmm4 = xmm4 + xmm5 ;)
       addps xmm4,xmm2         ; result for two vectors in xmm4
-      movaps [ebx],xmm4       ; Write result
+      movaps [ARG2],xmm4      ; Write result
 
       ;Increase address, decrease remaining vectors
-      sub ecx, 2
-      add ebx, 16
+      sub ARG3, 2
+      add ARG2, 16
 
       ; Loop ?
-      cmp ecx,0x2
+      cmp ARG3,0x2
       jge doTwo
 
-      cmp ecx,0x1
+      cmp ARG3,0x1
       jl transformEnd
 
       ; Load one vector
 doOne:
-      movlps xmm4, [ebx]      ; xmm4 = X X y1 x1
-      movlps xmm5, [ebx]      ; xmm5 = X X y1 x1
+      movlps xmm4, [ARG2]      ; xmm4 = X X y1 x1
+      movlps xmm5, [ARG2]      ; xmm5 = X X y1 x1
 
       ;Reorder one vector
       shufps xmm5,xmm5,0xB1   ; xmm4 = X X x1 y1
@@ -85,15 +101,12 @@ doOne:
       mulps xmm5,xmm0         ; xmm5 = X*SHY X*SHX x1*SHY y1*SHX
       addps xmm4,xmm5
       addps xmm4,xmm2         ; result for one vector in low part of xmm4
-      movlps [ebx],xmm4       ; Write result
+      movlps [ARG2],xmm4      ; Write result
 
 transformEnd:
 
-      pop eax
-      pop ebx
-      pop ecx
-      leave
-      ret
+	  leaveFunction
+
 
 ; function estimateFlatness
 ; C prototype;
@@ -116,18 +129,16 @@ transformEnd:
 
 estimateFlatness:
 
-      ; Get arguments
-      enter 0,0
-      push eax
-      push ebx
+	  enterFunction
 
-      mov eax, [ebp + 8]      ;Pointer to bezier points in eax
-      mov ebx, [ebp + 12]     ;Pointer to result ebx
+	  ; Arguments:
+      ; Pointer to bezier points in ARG1
+      ; Pointer to result ARG2
 
       ; Load bezier and estimate flatness of curve
-      movaps xmm0,[eax]       ; xmm0 = p2.y p2.x p1.y p1.x
-      movaps xmm1,[eax + 16]  ; xmm1 = p4.y p4.x p3.y p3.x
-      movaps xmm2, xmm0       ; xmm2 = p2.y p2.x p1.y p1.x
+      movaps xmm0,[ARG1]       ; xmm0 = p2.y p2.x p1.y p1.x
+      movaps xmm1,[ARG1 + 16]  ; xmm1 = p4.y p4.x p3.y p3.x
+      movaps xmm2, xmm0        ; xmm2 = p2.y p2.x p1.y p1.x
 
       ; Reorder data
       shufps xmm2,xmm1,0xE4   ; xmm2 = p4.y p4.x p1.y p1.x
@@ -151,12 +162,8 @@ estimateFlatness:
 
       ; Square result and store it
       mulps xmm0,xmm0         ; xmm0   = dy2 dx2 dy1 dx1
-      movaps [ebx],xmm0       ; result = dy2 dx2 dy1 dx1
+      movaps [ARG2],xmm0      ; result = dy2 dx2 dy1 dx1
 
-      pop ebx
-      pop eax
-
-      leave
-      ret
+	  leaveFunction
 
 section	.data

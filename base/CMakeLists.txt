@@ -6,16 +6,14 @@ if(OPTION_SSE32 OR OPTION_SSE64)
 
   if(NASM_EXECUTABLE)
     set(USE_SSE_ 1)
-
     set(BASE_NAME vplAsm)
 
     if(OPTION_SSE64)
        set(SSE_64_ 1)
-       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm64.asm)
-    else(OPTION_SSE64)
-       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm32.asm)
     endif(OPTION_SSE64)
-
+    
+  set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm.asm)
+  
   include(src/asm/CMakeLists.txt)
 
   else(NASM_EXECUTABLE)

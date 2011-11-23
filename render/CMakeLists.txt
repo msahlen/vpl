@@ -8,21 +8,20 @@ if(OPTION_SSE32 OR OPTION_SSE64)
   
   if(NASM_EXECUTABLE)
     set(USE_SSE_ 1)
-  
-    set(BASE_NAME vplBlendSSE)
+    set(BASE_NAME vplBlend)
     
     if(OPTION_SSE64)
-       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend64.asm)
-    else(OPTION_SSE64)
-       set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend32.asm)
-    endif(OPTION_SSE64)   
+       set(SSE_64_ 1)
+    endif(OPTION_SSE64)
+   
+    set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlendSrc.asm)   
   
-  include(../base/src/asm/CMakeLists.txt)
+    include(../base/src/asm/CMakeLists.txt)
   
-  add_custom_command( OUTPUT ${ASM_OBJECT}
-	              COMMAND ${NASM_EXECUTABLE}
-	              ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
-	              DEPENDS ${ASM_SOURCE})
+    add_custom_command( OUTPUT ${ASM_OBJECT}
+	                COMMAND ${NASM_EXECUTABLE}
+	                ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
+	                DEPENDS ${ASM_SOURCE})
 	              
   else(NASM_EXECUTABLE)
      message(STATUS "Not compiling SSE2 blending functions since we could'nt find nasm")  
