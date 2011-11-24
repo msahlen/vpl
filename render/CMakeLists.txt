@@ -14,7 +14,7 @@ if(OPTION_SSE32 OR OPTION_SSE64)
        set(SSE_64_ 1)
     endif(OPTION_SSE64)
    
-    set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlendSrc.asm)   
+    set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.asm)   
   
     include(../base/src/asm/CMakeLists.txt)
   
