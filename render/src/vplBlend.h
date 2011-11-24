@@ -209,19 +209,18 @@ namespace vpl
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
+			vplUchar alpha = getAlphaChannelFromRGBA(~color_);
+
             for(vplUint i = 0; i < count; i++)
-            {
-                dest[i] = color_ + \
-					multiplyPixel(dest[i],getAlphaChannelFromRGBA(~color_));
-            }
+				dest[i] = color_ + multiplyPixel(dest[i],alpha);
         }
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
-            for(vplUint i = 0; i < count; i++)
-            {
-                dest[i] = src[i] + \
-					multiplyPixel(dest[i],getAlphaChannelFromRGBA(~src[i]));
-            }
+			vplUchar alpha = getAlphaChannelFromRGBA(~color_);
+            
+			for(vplUint i = 0; i < count; i++)
+				dest[i] = src[i] + multiplyPixel(dest[i],alpha);
+            
         }
         
 		inline void setColor(vplUint32 color)

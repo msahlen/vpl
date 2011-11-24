@@ -20,26 +20,29 @@
 
 #include "vplConfig.h"
 
-static inline vplUchar getAlphaChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 24) & 0xFF);
-}
-static inline vplUchar getBlueChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 16) & 0xFF);
-}
-static inline vplUchar getGreenChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 8) & 0xFF);
-}
-static inline vplUchar getRedChannelFromRGBA(vplUint32 color)
-{
-    return (color & 0xFF);
-}
-
 namespace vpl
 {
-    inline vplUint32 multiplyPixel(vplUint32 pixel,vplUint32 alpha,vplUint subShift)
+	inline vplUchar getAlphaChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 24) & 0xFF);
+	}
+	
+	inline vplUchar getBlueChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 16) & 0xFF);
+	}
+	
+	inline vplUchar getGreenChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 8) & 0xFF);
+	}
+	
+	inline vplUchar getRedChannelFromRGBA(vplUint32 color)
+	{
+		return (color & 0xFF);
+	}
+
+	inline vplUint32 multiplyPixel(vplUint32 pixel,vplUint32 alpha,vplUint subShift)
     {
         vplUint32 c1 = (pixel & 0xff00ff) * alpha;
         vplUint32 c2 = ((pixel >> 8) & 0xff00ff) * alpha;
@@ -52,13 +55,16 @@ namespace vpl
 
     inline vplUint32 multiplyPixel(vplUint32 pixel, vplUint32 alpha)
     {
-        vplUint t = (pixel & 0xff00ff) * alpha;
-        t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
-        t &= 0xff00ff;
-        pixel = ((pixel >> 8) & 0xff00ff) * alpha;
-        pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
-        pixel &= 0xff00ff00;
-        pixel |= t;
+        if(alpha != 255)
+		{
+			vplUint t = (pixel & 0xff00ff) * alpha;
+			t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
+			t &= 0xff00ff;
+			pixel = ((pixel >> 8) & 0xff00ff) * alpha;
+			pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
+			pixel &= 0xff00ff00;
+			pixel |= t;
+		}
 
         return pixel;
     }

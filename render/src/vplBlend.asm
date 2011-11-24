@@ -95,7 +95,7 @@ doFour:
 
 doTwo:
        movq xmm0,[ARG2] ; xmm0 = 0 0 color color
-       sub ARG3, 2      ;Decrease remaining pixels
+       sub ARG3, 2      ; Decrease remaining pixels
        movq [ARG1],xmm0 ; Write result
        add ARG1, 8      ; Increase pointer
 
