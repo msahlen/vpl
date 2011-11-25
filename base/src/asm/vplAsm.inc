@@ -43,6 +43,23 @@
 	ret
 %endmacro
 
+
+%define TMP1 r11
+%define TMP2 r12
+%define TMP3 r13
+
+%define TMP1_32 r11d
+%define TMP2_32 r12d
+%define TMP3_32 r13d
+
+%define TMP1_16 r11w
+%define TMP2_16 r12w
+%define TMP3_16 r13w
+
+%define TMP1_8 r11b
+%define TMP2_8 r12b
+%define TMP3_8 r13b
+
 %ifdef WIN64
 
 %define ARG1 rcx
@@ -61,24 +78,40 @@
 
 %else 
 
-%define ARG1 eax
-%define ARG2 ebx
-%define ARG3 ecx
+%define ARG1 edx
+%define ARG2 esi
+%define ARG3 edi
+
+%define TMP1 eax
+%define TMP2 ebx
+%define TMP3 ecx
+
+%define TMP1_32 eax
+%define TMP2_32 ebx
+%define TMP3_32 ecx
+
+%define TMP1_16 ax
+%define TMP2_16 bx
+%define TMP3_16 cx
+
+%define TMP1_8 al
+%define TMP2_8 bl
+%define TMP3_8 cl
 
 %imacro enterFunction 0
       enter 0,0
-      push eax
-      push ebx
-      push ecx
-      mov eax, [ebp + 8]     
-      mov ebx, [ebp + 12]    
-      mov ecx, [ebp + 16]
+      push edx
+      push esi
+      push edi
+      mov ebx, [ebp + 8]     
+      mov esi, [ebp + 12]    
+      mov edi, [ebp + 16]
 %endmacro
 
 %imacro leaveFunction 0
-	  pop eax
+	  pop edi
+      pop esi
       pop ebx
-      pop ecx
       leave
       ret	 
 %endmacro

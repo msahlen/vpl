@@ -113,3 +113,101 @@ blendEnd:
       leaveFunction
 
 section	.data
+
+; -----------------------------------------------------------
+; Function memFillSSE2
+;
+; SSE2 version of memFill
+; -----------------------------------------------------------
+
+;align16
+;memFillSSE2:
+		
+;		enterFunction
+		
+;		movd xmm0, 	 
+;		cmp ARG3 32
+;		jl lessThan32
+
+;moreThan32:
+		
+		; Move 32 bytes
+;	    movq xmm0, [ARG2]
+;       movq xmm1, [ARG2 + 8]
+;        movq xmm2, [ARG2 + 16]
+;        movq xmm3, [ARG2 + 24]
+;        movq qword [ARG1],xmm0
+;        movq qword [ARG1 + 8],xmm1
+;        movq qword [ARG1 + 16],xmm2
+;        movq qword [ARG1 + 24],xmm3
+		
+		; Update pointers
+;		add ARG1 32
+;		add ARG2 32
+;		sub ARG3 32
+
+;lessThan32:
+
+;		cmp ARG3 16
+;		jl lessThan16
+ 
+		; Move 16 bytes
+;		movq xmm0, [ARG2]
+;       movq xmm1, [ARG2 + 8]
+;      movq qword [ARG1],xmm0
+;        movq qword [ARG1 + 8],xmm1
+		
+		; Update pointers
+;		add ARG1 16
+;		add ARG2 16
+;		sub ARG3 16
+
+;lessThan16:
+
+;		cmp ARG3 8
+;		jl lessThan8
+
+		 ; move 8 bytes
+ ;       movq xmm0, [ARG2]
+ ;       movq qword [ARG1], xmm0
+
+		; Update pointers
+;		add ARG1 8
+;		add ARG2 8
+;		sub ARG3 8
+
+;lessThan8:
+
+;		cmp ARG3 4
+;		jl lessThan4
+		
+		; Move 4 bytes
+;		mov TMP1, [ARG2]
+;        mov [ARG1], TMP1_32
+
+		; Update pointers
+;		add ARG1 4
+;		add ARG2 4
+;		sub ARG3 4
+
+lessThan4:
+
+;		cmp ARG3 2
+;		jl lessThan2
+
+		; Move 2 bytes
+;        movzx   TMP1, word [ARG2]
+;        mov     [ARG1], TMP1_16
+
+lessThan2:
+		
+;		cmp ARG3 1
+;		jl memFillEnd
+
+		; Move 1 byte
+;        movzx   TMP1, byte [ARG2]
+;        mov     [ARG1], TMP1_8
+
+;memFillEnd:
+
+;		leaveFunction

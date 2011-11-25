@@ -1,18 +1,18 @@
-;VPL - Vector path library
-;Copyright (C) 2009 - 2011 Mattias Sahlén <Mattias Sahlén <mattias.sahlen@gmail.com>>
-;This library is free software; you can redistribute it and/or
-;modify it under the terms of the GNU General General Public
-;License as published by the Free Software Foundation; either
-;version 2.1 of the License, or (at your option) any later version.
+; VPL - Vector path library
+; Copyright (C) 2009 - 2011 Mattias Sahlén <Mattias Sahlén <mattias.sahlen@gmail.com>>
+; This library is free software; you can redistribute it and/or
+; modify it under the terms of the GNU General General Public
+; License as published by the Free Software Foundation; either
+; version 2.1 of the License, or (at your option) any later version.
 
-;This library is distributed in the hope that it will be useful,
-;but WITHOUT ANY WARRANTY; without even the implied warranty of
-;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;General General Public License for more details.
+; This library is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General General Public License for more details.
 
-;You should have received a copy of the GNU General General Public
-;License along with this library;
-;if not, see <http://www.gnu.org/licenses/>.
+; You should have received a copy of the GNU General General Public
+; License along with this library;
+; if not, see <http://www.gnu.org/licenses/>.
 
 %include "vplAsm.inc"
 
@@ -22,11 +22,14 @@ section	.text
 global batchTransform
 global estimateFlatness
 
+; ----------------------------------------------------------- 
 ; function batchTransform
+;
 ; transform an array of vectors
+;
 ; C prototype;
 ; void batchTransform(float* transform,float* vectors,unsigned int numVectors)
-
+;
 ; Matrix layout
 ; SX  transform[0]
 ; SHX transform[1]
@@ -34,10 +37,13 @@ global estimateFlatness
 ; SHY transform[3]
 ; SY  transform[4]
 ; TY  transform[5]
+;
+; Formula :
+; new x = x * SX  + y_ * SHX + TX;
+; new y = x * SHY + y_ * SY  + TY;
+; -----------------------------------------------------------
 
-;new_x = x * SX  + y_ * SHX + TX;
-;new_y = x * SHY + y_ * SY  + TY;
-
+align 16
 batchTransform:
 
 	  enterFunction
@@ -107,11 +113,13 @@ transformEnd:
 
 	  leaveFunction
 
-
+; -----------------------------------------------------------
 ; function estimateFlatness
+;
 ; C prototype;
 ; void estimateFlatness(float* bezier,float* deltas)
-; Data stored like:
+;
+; bezier legend:
 ; bezier[0] = from.x_;
 ; bezier[1] = from.y_;
 ; bezier[2] = control1.x_;
@@ -126,7 +134,9 @@ transformEnd:
 ; p2 = control1;
 ; p3 = control2;
 ; p4 = to;
+; -----------------------------------------------------------
 
+align 16
 estimateFlatness:
 
 	  enterFunction

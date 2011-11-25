@@ -88,21 +88,21 @@ namespace vpl
     };
 
     //Affine transformation matrices
-    class TranslationMatrix:public AffineMatrix
+    class VPL_API TranslationMatrix:public AffineMatrix
     {
     public:
         TranslationMatrix(float x,float y);
         ~TranslationMatrix(){}
     };
     // Rotation matrix
-    class RotationMatrix:public AffineMatrix
+    class VPL_API RotationMatrix:public AffineMatrix
     {
     public:
         RotationMatrix(float rads);
         ~RotationMatrix(){}
     };
     // Scaling matrix
-    class ScalingMatrix:public AffineMatrix
+    class VPL_API ScalingMatrix:public AffineMatrix
     {
     public:
 
@@ -111,7 +111,7 @@ namespace vpl
          ~ScalingMatrix(){}
     };
     //Shear matrix
-    class ShearMatrix:public AffineMatrix
+    class VPL_API ShearMatrix:public AffineMatrix
     {
     public:
         ShearMatrix(float rads);

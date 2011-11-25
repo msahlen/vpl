@@ -19,7 +19,6 @@
 #define VPL_MEMORY_H_INCLUDED_
 
 #include <cstring>
-
 #include "vplConfig.h"
 
 #if defined(_MSC_VER)
@@ -32,6 +31,34 @@
 
 namespace vpl
 {
+	// Our own memcopy and memfill ?
+	// Might try to do some optimized versions in the future
+	// http://en.wikipedia.org/wiki/Duffs_device
+
+	template <class T> inline void vplMemFill(T* dest,T src,vplUint count)
+	{
+		register vplUint n = (count + 7) / 8;
+
+        switch(count & 0x07)
+        {
+            case 0: do
+            {       *dest++ = src;
+            case 7: *dest++ = src;
+            case 6: *dest++ = src;
+            case 5: *dest++ = src;
+            case 4: *dest++ = src;
+            case 3: *dest++ = src;
+            case 2: *dest++ = src;
+            case 1: *dest++ = src;
+            } while (--n > 0);
+        }
+	}
+
+	template <class T> inline void vplMemCopy(T* dest,const T* src,vplUint count)
+	{
+		std::memcpy(dest,src,count*sizeof(T));
+	}
+
 	enum Alignment
 	{
 		cNoAlignment  = 0,
@@ -71,6 +98,7 @@ namespace vpl
 			alignedData_ = data_ = 0;
         }
 
+		// "Getters"
         inline T* getMemory()                       
 		{ 
 			return alignedData_;
@@ -86,16 +114,6 @@ namespace vpl
 			return size_;
 		}
         
-		inline T& operator[](vplUint i)             
-		{ 
-			return alignedData_[i];
-		}
-        
-		inline const T& operator[](vplUint i) const 
-		{ 
-			return alignedData_[i];
-		}
-        
 		inline T& getAt(vplUint i)                  
 		{ 
 			return alignedData_[i];
@@ -106,6 +124,18 @@ namespace vpl
 			return alignedData_[i];
 		}
 
+		// Operator overload to make it like an array.
+		// Note: No bounds checking!
+		inline T& operator[](vplUint i)             
+		{ 
+			return alignedData_[i];
+		}
+        
+		inline const T& operator[](vplUint i) const 
+		{ 
+			return alignedData_[i];
+		}
+        
         // Align data
         void align(Alignment alignment)
         {
@@ -113,6 +143,8 @@ namespace vpl
             align();
         }
 
+		// Reallocate memory, keeping the contents if 
+		// new size is bigger than the old
         void reAllocate(vplUint newSize)
         {
             vplUint oldSize = size_;
@@ -124,7 +156,8 @@ namespace vpl
                 T* newData        = new T[size_ + alignment_];
                 T* newAlignedData = (T*)(size_t(newData + alignment_) & ~alignment_);
 
-                std::memcpy(newAlignedData,alignedData_,oldSize*sizeof(T));
+				if(newSize > oldSize)
+					vplMemCopy(newAlignedData,alignedData_,oldSize);
 
                 delete [] data_;
 
@@ -135,7 +168,9 @@ namespace vpl
             else
             {
                 T* newData = new T[size_];
-                std::memcpy(newData,data_,oldSize*sizeof(T));
+
+				if(newSize > oldSize)
+					vplMemCopy(newData,data_,oldSize);
 
                 delete [] data_;
 
@@ -143,11 +178,13 @@ namespace vpl
             }
         }
         
+		// Standard way to increase memory is to just double it
 		inline void reAllocate()
 		{
 			reAllocate(size_*2);
 		}
         
+		// Clear data and set a new size
 		inline void clearAndResize(vplUint newSize)
         {
 			if(data_)

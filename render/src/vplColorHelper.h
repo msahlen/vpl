@@ -55,7 +55,9 @@ namespace vpl
 
     inline vplUint32 multiplyPixel(vplUint32 pixel, vplUint32 alpha)
     {
-        if(alpha != 255)
+        if(alpha == 0)
+			return 0;
+		else
 		{
 			vplUint t = (pixel & 0xff00ff) * alpha;
 			t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
@@ -64,9 +66,9 @@ namespace vpl
 			pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
 			pixel &= 0xff00ff00;
 			pixel |= t;
-		}
 
-        return pixel;
+			return pixel;
+		}
     }
 
     inline vplUint32 interpolatePixel(vplUint32 color1, vplUint32 alpha1,
