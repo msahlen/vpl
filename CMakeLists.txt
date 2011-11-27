@@ -8,13 +8,13 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 # Options
 ######################################################################
 
-option(OPTION_SSE32 "Enable compilation of sse code using nasm" OFF)
+option(OPTION_SSE2_32 "Enable compilation of sse2 code using nasm" OFF)
   find_program(NASM_EXECUTABLE nasm)
-set(USE_SSE_ 0)
+set(USE_SSE2_ 0)
 
-option(OPTION_SSE64 "Enable compilation of sse code using nasm" OFF)
+option(OPTION_SSE2_64 "Enable compilation of sse2 code using nasm" OFF)
   find_program(NASM_EXECUTABLE nasm)
-set(USE_SSE_ 0)
+set(USE_SSE2_ 0)
 
 # Allow selection of static/dynamic libraries
 option(BUILD_SHARED_LIBS "Build Shared Libraries" ON)

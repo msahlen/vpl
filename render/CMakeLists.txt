@@ -4,10 +4,10 @@
 
 set(ASM_SOURCE "")
 
-if(OPTION_SSE32 OR OPTION_SSE64)
+if(OPTION_SSE2_32 OR OPTION_SSE2_64)
   
   if(NASM_EXECUTABLE)
-    set(USE_SSE_ 1)
+    set(USE_SSE2_ 1)
     set(BASE_NAME vplBlend)
     
     if(OPTION_SSE64)
@@ -27,7 +27,7 @@ if(OPTION_SSE32 OR OPTION_SSE64)
      message(STATUS "Not compiling SSE2 blending functions since we could'nt find nasm")  
   endif(NASM_EXECUTABLE)
 
-endif(OPTION_SSE32 OR OPTION_SSE64)  
+endif(OPTION_SSE2_32 OR OPTION_SSE2_64)  
 
 ######################################################################
 # Configure source

@@ -2,15 +2,15 @@
 # Configure nasm?
 ######################################################################
 
-if(OPTION_SSE32 OR OPTION_SSE64)
+if(OPTION_SSE2_32 OR OPTION_SSE2_64)
 
   if(NASM_EXECUTABLE)
-    set(USE_SSE_ 1)
+    set(USE_SSE2_ 1)
     set(BASE_NAME vplAsm)
 
-    if(OPTION_SSE64)
-       set(SSE_64_ 1)
-    endif(OPTION_SSE64)
+    if(OPTION_SSE2_64)
+       set(SSE2_64_ 1)
+    endif(OPTION_SSE2_64)
     
   set(ASM_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/asm/vplAsm.asm)
   
@@ -25,7 +25,7 @@ if(OPTION_SSE32 OR OPTION_SSE64)
                       ARGS ${NASM_OPTIONS} ${NASM_FORMAT} -o ${ASM_OBJECT} ${ASM_SOURCE}
                       DEPENDS ${ASM_SOURCE} )
 
-endif(OPTION_SSE32 OR OPTION_SSE64)
+endif(OPTION_SSE2_32 OR OPTION_SSE2_64)
 
 ######################################################################
 # Configure source

@@ -29,10 +29,10 @@
     #define MEM_ALIGN(declaration, alignment) declaration
 #endif
 
+
 namespace vpl
 {
-	// Our own memcopy and memfill ?
-	// Might try to do some optimized versions in the future
+	// Our own memcopy and memfill
 	// http://en.wikipedia.org/wiki/Duffs_device
 
 	template <class T> inline void vplMemFill(T* dest,T src,vplUint count)
@@ -58,6 +58,44 @@ namespace vpl
 	{
 		std::memcpy(dest,src,count*sizeof(T));
 	}
+
+    // Specialized version of memfill for 32 bit unsigned integers
+    // Used in blendroutines might be SSE2 accelerated
+    #ifdef USE_SSE2_
+
+    extern "C" void PRE_CDECL_ memFill32SSE2(vplUint32* dest,
+                                             vplUint32 value,
+                                             vplUint count) POST_CDECL_;
+
+    inline void vplMemFill32(vplUint32* dest,vplUint32 value,vplUint count)
+    {
+        if(count < 7)
+            vplMemFill(dest,value,count);
+
+        // Align data
+        vplUint align = (vplPtr)dest & 0xf;
+
+        switch (align)
+        {
+            case 4:  *dest++ = value; --count;
+            case 8:  *dest++ = value; --count;
+            case 12: *dest++ = value; --count;
+        }
+
+        // Call optimized version
+        memFill32SSE2(dest,value,count);
+    }
+
+    // Else fall back to our standard memfill
+    #else
+
+    inline void vplMemFill32(vplUint32* src,vplUint32 value,vplUint count)
+    {
+        vplMemFill(src,value,count);
+    }
+
+    #endif
+
 
 	enum Alignment
 	{
@@ -99,43 +137,43 @@ namespace vpl
         }
 
 		// "Getters"
-        inline T* getMemory()                       
-		{ 
+        inline T* getMemory()
+		{
 			return alignedData_;
 		}
 
-        inline const T* getMemory() const           
-		{ 
+        inline const T* getMemory() const
+		{
 			return alignedData_;
 		}
-        
-		inline vplUint getSize() const              
-		{ 
+
+		inline vplUint getSize() const
+		{
 			return size_;
 		}
-        
-		inline T& getAt(vplUint i)                  
-		{ 
+
+		inline T& getAt(vplUint i)
+		{
 			return alignedData_[i];
 		}
-        
-		inline const T& getAt(vplUint i) const      
-		{ 
+
+		inline const T& getAt(vplUint i) const
+		{
 			return alignedData_[i];
 		}
 
 		// Operator overload to make it like an array.
 		// Note: No bounds checking!
-		inline T& operator[](vplUint i)             
-		{ 
+		inline T& operator[](vplUint i)
+		{
 			return alignedData_[i];
 		}
-        
-		inline const T& operator[](vplUint i) const 
-		{ 
+
+		inline const T& operator[](vplUint i) const
+		{
 			return alignedData_[i];
 		}
-        
+
         // Align data
         void align(Alignment alignment)
         {
@@ -143,7 +181,7 @@ namespace vpl
             align();
         }
 
-		// Reallocate memory, keeping the contents if 
+		// Reallocate memory, keeping the contents if
 		// new size is bigger than the old
         void reAllocate(vplUint newSize)
         {
@@ -154,7 +192,7 @@ namespace vpl
             if(alignment_ )
             {
                 T* newData        = new T[size_ + alignment_];
-                T* newAlignedData = (T*)(size_t(newData + alignment_) & ~alignment_);
+                T* newAlignedData = (T*)(vplPtrDiff(newData + alignment_) & ~alignment_);
 
 				if(newSize > oldSize)
 					vplMemCopy(newAlignedData,alignedData_,oldSize);
@@ -177,13 +215,13 @@ namespace vpl
                 data_ = alignedData_ = newData;
             }
         }
-        
+
 		// Standard way to increase memory is to just double it
 		inline void reAllocate()
 		{
 			reAllocate(size_*2);
 		}
-        
+
 		// Clear data and set a new size
 		inline void clearAndResize(vplUint newSize)
         {
@@ -204,7 +242,7 @@ namespace vpl
         void align()
         {
             T* newData        = new T[size_ + alignment_];
-            T* newAlignedData = (T*)(size_t(newData + alignment_) & ~alignment_);
+            T* newAlignedData = (T*)(vplPtrDiff(newData + alignment_) & ~alignment_);
 
             if(data_)
                 delete [] data_;

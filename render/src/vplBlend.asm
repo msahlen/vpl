@@ -19,17 +19,12 @@
 section	.text
 
 ; Exported functions
-global blendSrc
-global blendSrcSolid
+global memFill32SSE2
 
 ; C prototype;
-; All blend functions look like:
-; void blendSolid(vplUint32* dest,vplUint32* color,vplUint count)
-; void blend(vplUint32* dest,vplUint32* src,vplUint count)
-; count is how many pixels that should be blended, this always at least 8
+; void vplMemFill32(vplUint32* dest,vplUint32 value,vplUint count)
 
-; Src blend, solid color
-blendSrcSolid:
+memFill32SSE2:
 
       enterFunction
 
@@ -37,82 +32,88 @@ blendSrcSolid:
       movd xmm0,[ARG2]     ; xmm0 = 0 0 0 color
       shufps xmm0,xmm0,0x0 ; xmm0 = color color color color
 
-doFourSolid:
+      cmp ARG3,4
+      jl fill2
+
+      cmp ARG3,8
+      jl fill4
+
+      cmp ARG3,16
+      jl fill8
+
+      cmp ARG3,32
+      jl fill16
+
+fill32:
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+      movaps [ARG1 + 32],xmm0  ; Write result
+      movaps [ARG1 + 48],xmm0  ; Write result
+      movaps [ARG1 + 64],xmm0  ; Write result
+      movaps [ARG1 + 80],xmm0  ; Write result
+      movaps [ARG1 + 96],xmm0  ; Write result
+      movaps [ARG1 + 112],xmm0  ; Write result
+
+      sub ARG3, 32
+      add ARG1, 128
+
+      cmp ARG3,32
+      jge fill32
+
+
+fill16:
+      cmp ARG3,16
+      jl fill8
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+      movaps [ARG1 + 32],xmm0  ; Write result
+      movaps [ARG1 + 48],xmm0  ; Write result
+
+      sub ARG3, 16
+      add ARG1, 64
+
+fill8:
+      cmp ARG3,8
+      jl fill4
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+
+      sub ARG3, 8
+      add ARG1, 48
+
+fill4:
+      cmp ARG3,4
+      jl fill2
+
       movaps [ARG1],xmm0  ; Write result
 
       ;Increase address, decrease remaining pixels
       sub ARG3, 4
       add ARG1, 16
 
-      ; Loop ?
-      cmp ARG3,0x4
-      jge doFourSolid
+fill2:
+      cmp ARG3,0x1
+      jl fill1
 
-	  cmp ARG3,0x1
-      jle doOneSolid
-
-doTwoSolid:
-	  movq [ARG1],xmm0  ; Write result
+      movq [ARG1],xmm0  ; Write result
 
       ;Increase address, decrease remaining pixels
       sub ARG3, 2
       add ARG1, 8
 
-doOneSolid:
+fill1:
 	  cmp ARG3,0x0
-	  je blendEndSolid
+	  je fillEnd
 
 	  mov ARG3,[ARG2]
-	  mov [ARG1],ARG3
+	  mov [ARG1],ARG3_32
 
-blendEndSolid:
-
-      leaveFunction
-
-
-; Blend src, color is not solid
-blendSrc:
-
-      enterFunction
-
-doFour:
-
-      movaps xmm0,[ARG2] ; xmm0 = color color color color
-
-      sub ARG3, 4         ; Decrease remaining pixels
-      movaps [ARG1],xmm0  ; Write result
-
-      ; Increase pointers
-      add ARG1, 16
-      add ARG2, 16
-
-      ; Loop ?
-      cmp ARG3,0x4
-      jge doFour
-
-      cmp ARG3,0x1
-      jle doOne
-
-doTwo:
-       movq xmm0,[ARG2] ; xmm0 = 0 0 color color
-       sub ARG3, 2      ; Decrease remaining pixels
-       movq [ARG1],xmm0 ; Write result
-       add ARG1, 8      ; Increase pointer
-
-doOne:
-      ; are we done?
-      cmp ARG3,0x0
-      je blendEnd
-
-      ; write last pixel
-      mov ARG3,[ARG2]
-      mov [ARG1],ARG3
-
-blendEnd:
+fillEnd:
 
       leaveFunction
-
-section	.data
 
 ; -----------------------------------------------------------
 ; Function memFillSSE2
@@ -122,15 +123,15 @@ section	.data
 
 ;align16
 ;memFillSSE2:
-		
+
 ;		enterFunction
-		
-;		movd xmm0, 	 
+
+;		movd xmm0,
 ;		cmp ARG3 32
 ;		jl lessThan32
 
 ;moreThan32:
-		
+
 		; Move 32 bytes
 ;	    movq xmm0, [ARG2]
 ;       movq xmm1, [ARG2 + 8]
@@ -140,7 +141,7 @@ section	.data
 ;        movq qword [ARG1 + 8],xmm1
 ;        movq qword [ARG1 + 16],xmm2
 ;        movq qword [ARG1 + 24],xmm3
-		
+
 		; Update pointers
 ;		add ARG1 32
 ;		add ARG2 32
@@ -150,13 +151,13 @@ section	.data
 
 ;		cmp ARG3 16
 ;		jl lessThan16
- 
+
 		; Move 16 bytes
 ;		movq xmm0, [ARG2]
 ;       movq xmm1, [ARG2 + 8]
 ;      movq qword [ARG1],xmm0
 ;        movq qword [ARG1 + 8],xmm1
-		
+
 		; Update pointers
 ;		add ARG1 16
 ;		add ARG2 16
@@ -180,7 +181,7 @@ section	.data
 
 ;		cmp ARG3 4
 ;		jl lessThan4
-		
+
 		; Move 4 bytes
 ;		mov TMP1, [ARG2]
 ;        mov [ARG1], TMP1_32
@@ -200,7 +201,7 @@ lessThan4:
 ;        mov     [ARG1], TMP1_16
 
 lessThan2:
-		
+
 ;		cmp ARG3 1
 ;		jl memFillEnd
 

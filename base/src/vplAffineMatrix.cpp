@@ -24,7 +24,7 @@
 #define SY  m_[4]
 #define TY  m_[5]
 
-#ifdef USE_SSE_
+#ifdef USE_SSE2_
 
 extern "C" void PRE_CDECL_ batchTransform(const float* transform,
                                           float* vectors,
@@ -37,14 +37,14 @@ inline void batchTransform(const float* transform,
 {
     for (vplUint i = 0;i < numVectors;i+=2)
     {
-        float tmpX  = vectors[2*i1;
+        float tmpX  = vectors[2*i];
 
-        vectors[2*i1 = tmpX * transform[0]  + vectors[2*i+1] * transform[1] + transform[2];
+        vectors[2*i] = tmpX * transform[0]  + vectors[2*i+1] * transform[1] + transform[2];
         vectors[2*i+1] = tmpX * transform[3] + vectors[2*i+1] * transform[4]  + transform[5];
     }
 }
 
-#endif // USE_SSE__
+#endif // USE_SSE2__
 
 namespace vpl
 {

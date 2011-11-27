@@ -40,7 +40,7 @@ inline static void estimateFlatness(float* bezier,float* deltas)
 }
 
 #define DECLARE_ARRAY(a) a
-#define ALIGN_ARRAY(b) 
+#define ALIGN_ARRAY(b)
 
 #endif // USE_SSE__
 

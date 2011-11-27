@@ -21,8 +21,9 @@ section	.text
 ; Exported functions
 global batchTransform
 global estimateFlatness
+global memFill32SSE2
 
-; ----------------------------------------------------------- 
+; -----------------------------------------------------------
 ; function batchTransform
 ;
 ; transform an array of vectors
@@ -175,5 +176,105 @@ estimateFlatness:
       movaps [ARG2],xmm0      ; result = dy2 dx2 dy1 dx1
 
 	  leaveFunction
+
+;-----------------------------------------------------------------
+; Function memFill32SSE2
+;
+; C prototype;
+; void memFill32SSE2(vplUint32* dest,vplUint32 value,vplUint count)
+;
+; Data must be aligned before calling this.
+
+align16
+memFill32SSE2:
+
+      enterFunction
+
+      ; Load data and shuffle data
+      movd xmm0,[ARG2]     ; xmm0 = 0 0 0 color
+      shufps xmm0,xmm0,0x0 ; xmm0 = color color color color
+
+      cmp ARG3,4
+      jl fill2
+
+      cmp ARG3,8
+      jl fill4
+
+      cmp ARG3,16
+      jl fill8
+
+      cmp ARG3,32
+      jl fill16
+
+fill32:
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+      movaps [ARG1 + 32],xmm0  ; Write result
+      movaps [ARG1 + 48],xmm0  ; Write result
+      movaps [ARG1 + 64],xmm0  ; Write result
+      movaps [ARG1 + 80],xmm0  ; Write result
+      movaps [ARG1 + 96],xmm0  ; Write result
+      movaps [ARG1 + 112],xmm0  ; Write result
+
+      sub ARG3, 32
+      add ARG1, 128
+
+      cmp ARG3,32
+      jge fill32
+
+
+fill16:
+      cmp ARG3,16
+      jl fill8
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+      movaps [ARG1 + 32],xmm0  ; Write result
+      movaps [ARG1 + 48],xmm0  ; Write result
+
+      sub ARG3, 16
+      add ARG1, 64
+
+fill8:
+      cmp ARG3,8
+      jl fill4
+
+      movaps [ARG1],xmm0  ; Write result
+      movaps [ARG1 + 16],xmm0  ; Write result
+
+      sub ARG3, 8
+      add ARG1, 48
+
+fill4:
+      cmp ARG3,4
+      jl fill2
+
+      movaps [ARG1],xmm0  ; Write result
+
+      ;Increase address, decrease remaining pixels
+      sub ARG3, 4
+      add ARG1, 16
+
+fill2:
+      cmp ARG3,0x1
+      jl fill1
+
+      movq [ARG1],xmm0  ; Write result
+
+      ;Increase address, decrease remaining pixels
+      sub ARG3, 2
+      add ARG1, 8
+
+fill1:
+      cmp ARG3,0x0
+      je fillEnd
+
+      mov ARG3,[ARG2]
+      mov [ARG1],ARG3_32
+
+fillEnd:
+
+      leaveFunction
 
 section	.data

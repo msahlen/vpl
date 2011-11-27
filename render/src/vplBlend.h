@@ -40,12 +40,12 @@ namespace vpl
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-			vplMemFill(dest,color_,count);  
+			vplMemFill32(dest,color_,count);
         }
 
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
-            vplMemCopy(dest,src,count);  
+            vplMemCopy(dest,src,count);
         }
 
         inline void setColor(vplUint32 color)
@@ -74,7 +74,7 @@ namespace vpl
         {
 			vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
-            vplMemCopy(dest,gradientPixels,count);  
+            vplMemCopy(dest,gradientPixels,count);
         }
 
         inline void setGradient(Gradient* gradient)
@@ -109,7 +109,7 @@ namespace vpl
         void blend(vplUint32*,const vplUint32*,vplUint) const
         {
         }
-       
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -166,7 +166,7 @@ namespace vpl
 			vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color_);
 
 			if(0 == oneMinusAlpha)
-				vplMemFill(dest,color_,count);  
+				vplMemFill32(dest,color_,count);
 			else
 			{
 				for(vplUint i = 0; i < count; i++)
@@ -177,16 +177,16 @@ namespace vpl
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
 			vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color_);
-            
+
 			if(0 == oneMinusAlpha)
-				vplMemCopy(dest,src,count);  
+				vplMemCopy(dest,src,count);
 			else
 			{
 				for(vplUint i = 0; i < count; i++)
 					dest[i] = src[i] + multiplyPixel(dest[i],oneMinusAlpha);
 			}
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -219,7 +219,7 @@ namespace vpl
 					multiplyPixel(dest[i],getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -247,14 +247,14 @@ namespace vpl
         {
             for(vplUint i = 0; i < count; i++)
 				dest[i] =  dest[i] + multiplyPixel(color_,getAlphaChannelFromRGBA(~dest[i]));
-            
+
         }
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
 				dest[i] = dest[i] + multiplyPixel(src[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -288,7 +288,7 @@ namespace vpl
             }
 
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -355,7 +355,7 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
 				dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(dest[i]));
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -391,7 +391,7 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(src[i]));
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -422,7 +422,7 @@ namespace vpl
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(gradientPixels[i]));
 
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -458,7 +458,7 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(src[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -488,7 +488,7 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
 				dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -524,7 +524,7 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(~src[i]));
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -557,7 +557,7 @@ namespace vpl
 					                    getAlphaChannelFromRGBA(~gradientPixels[i]));
 			}
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -606,7 +606,7 @@ namespace vpl
 										   dest[i],getAlphaChannelFromRGBA(~src[i]));
             }
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -641,12 +641,12 @@ namespace vpl
 										   getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
 		}
-		
+
 		inline vplUint32 getColor()
         {
             return 0;
@@ -673,7 +673,7 @@ namespace vpl
             {
                 dest[i] = interpolatePixel(dest[i],
 					                       getAlphaChannelFromRGBA(color_),
-										   color_, 
+										   color_,
 										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
@@ -684,11 +684,11 @@ namespace vpl
             {
                 dest[i] = interpolatePixel(dest[i],
 					                       getAlphaChannelFromRGBA(src[i]),
-										   src[i], 
+										   src[i],
 										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
-        
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -719,11 +719,11 @@ namespace vpl
             {
                 dest[i] = interpolatePixel(dest[i],
 					                       getAlphaChannelFromRGBA(gradientPixels[i]),
-										   gradientPixels[i], 
+										   gradientPixels[i],
 										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -771,7 +771,7 @@ namespace vpl
 										   getAlphaChannelFromRGBA(~src[i]));
             }
         }
-       
+
 		inline void setColor(vplUint32 color)
         {
             color_ = color;
@@ -806,7 +806,7 @@ namespace vpl
 										   getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        
+
 		inline void setGradient(Gradient* gradient)
 		{
 			gradient_ = gradient;
@@ -821,7 +821,7 @@ namespace vpl
 
         Gradient* gradient_;
     };
-	
+
 	// Ar = 0
     // Cr = 0
     class VPL_API ClearBlender
@@ -833,12 +833,12 @@ namespace vpl
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-           vplMemFill(dest,(vplUint32)0,count);
+           vplMemFill32(dest,(vplUint32)0,count);
         }
 
         inline void blend(vplUint32* dest,const vplUint32*,vplUint count) const
         {
-           vplMemFill(dest,(vplUint32)0,count);
+           vplMemFill32(dest,(vplUint32)0,count);
         }
 
         inline void setColor(vplUint32 color)
@@ -859,7 +859,7 @@ namespace vpl
      template<typename T> class VPL_API Composer
      {
 	 public:
-		
+
 		Composer(){}
         ~Composer(){}
 
