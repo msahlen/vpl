@@ -44,7 +44,6 @@ global memFill32SSE2
 ; new y = x * SHY + y_ * SY  + TY;
 ; -----------------------------------------------------------
 
-align 16
 batchTransform:
 
 	  enterFunction
@@ -137,7 +136,6 @@ transformEnd:
 ; p4 = to;
 ; -----------------------------------------------------------
 
-align 16
 estimateFlatness:
 
 	  enterFunction
@@ -181,11 +179,11 @@ estimateFlatness:
 ; Function memFill32SSE2
 ;
 ; C prototype;
-; void memFill32SSE2(vplUint32* dest,vplUint32 value,vplUint count)
+; void memFill32SSE2(vplUint32* dest,vplUint32* value,vplUint count)
 ;
 ; Data must be aligned before calling this.
 
-align16
+
 memFill32SSE2:
 
       enterFunction
@@ -244,7 +242,7 @@ fill8:
       movaps [ARG1 + 16],xmm0  ; Write result
 
       sub ARG3, 8
-      add ARG1, 48
+      add ARG1, 32
 
 fill4:
       cmp ARG3,4
@@ -257,7 +255,7 @@ fill4:
       add ARG1, 16
 
 fill2:
-      cmp ARG3,0x1
+      cmp ARG3,2
       jl fill1
 
       movq [ARG1],xmm0  ; Write result
@@ -267,7 +265,7 @@ fill2:
       add ARG1, 8
 
 fill1:
-      cmp ARG3,0x0
+      cmp ARG3,0
       je fillEnd
 
       mov ARG3,[ARG2]

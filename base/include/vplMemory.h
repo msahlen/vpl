@@ -60,30 +60,29 @@ namespace vpl
 	}
 
     // Specialized version of memfill for 32 bit unsigned integers
-    // Used in blendroutines might be SSE2 accelerated
+    // Used in blendroutines, might be SSE2 accelerated
     #ifdef USE_SSE2_
 
     extern "C" void PRE_CDECL_ memFill32SSE2(vplUint32* dest,
-                                             vplUint32 value,
+                                             vplUint32* value,
                                              vplUint count) POST_CDECL_;
 
     inline void vplMemFill32(vplUint32* dest,vplUint32 value,vplUint count)
     {
         if(count < 7)
-            vplMemFill(dest,value,count);
+            return vplMemFill(dest,value,count);
 
-        // Align data
-        vplUint align = (vplPtr)dest & 0xf;
-
-        switch (align)
-        {
-            case 4:  *dest++ = value; --count;
-            case 8:  *dest++ = value; --count;
-            case 12: *dest++ = value; --count;
-        }
+		vplUint align = (vplPtr)(dest) & 0xf;
+		
+		switch (align) 
+		{
+			case 4:  *dest++ = value; --count;
+			case 8:  *dest++ = value; --count;
+			case 12: *dest++ = value; --count;
+		}
 
         // Call optimized version
-        memFill32SSE2(dest,value,count);
+        memFill32SSE2(dest,&value,count);
     }
 
     // Else fall back to our standard memfill

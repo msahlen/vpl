@@ -52,7 +52,6 @@
 	ret
 %endmacro
 
-
 %define TMP1 r11
 %define TMP2 r12
 %define TMP3 r13
@@ -97,32 +96,33 @@
 
 %else
 
-%define ARG1 edx
+%define ARG1 ebx
 %define ARG2 esi
 %define ARG3 edi
-%define ARG1_32 edx
+
+%define ARG1_32 ebx
 %define ARG2_32 esi
 %define ARG3_32 edi
 
 %define TMP1 eax
-%define TMP2 ebx
-%define TMP3 ecx
+%define TMP2 ecx
+%define TMP3 edx
 
 %define TMP1_32 eax
-%define TMP2_32 ebx
-%define TMP3_32 ecx
+%define TMP2_32 ecx
+%define TMP3_32 edx
 
 %define TMP1_16 ax
-%define TMP2_16 bx
-%define TMP3_16 cx
+%define TMP2_16 cx
+%define TMP3_16 dx
 
 %define TMP1_8 al
-%define TMP2_8 bl
-%define TMP3_8 cl
+%define TMP2_8 cl
+%define TMP3_8 dl
 
 %imacro enterFunction 0
       enter 0,0
-      push edx
+      push ebx
       push esi
       push edi
       mov ebx, [ebp + 8]

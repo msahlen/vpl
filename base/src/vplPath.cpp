@@ -18,7 +18,7 @@
 #include "vplAffineMatrix.h"
 #include "vplPath.h"
 
-#ifdef USE_SSE_
+#ifdef USE_SSE2_
 
 extern "C" void PRE_CDECL_ estimateFlatness(float* bezier,float* deltas) POST_CDECL_;
 
