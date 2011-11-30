@@ -29,6 +29,65 @@
     #define MEM_ALIGN(declaration, alignment) declaration
 #endif
 
+#ifdef USE_SSE2_
+
+extern "C" void PRE_CDECL_ memFill32SSE2(vplUint32* dest,
+                                         vplUint32* value,
+                                         vplUint count) POST_CDECL_;
+
+inline void memFill32(vplUint32* dest,vplUint32 value,vplUint count)
+{
+	// No need to call optimized version if count is small 
+    if(count < 7)
+	{
+        switch(count)
+		{
+			case 6: *dest++ = value;
+			case 5: *dest++ = value;
+			case 4: *dest++ = value;
+			case 3: *dest++ = value;
+			case 2: *dest++ = value;
+			case 1: *dest++ = value;
+		}
+		return;
+	}
+
+	// Align destination
+	vplUint align = (vplPtr)(dest) & 0xf;
+		
+	switch (align) 
+	{
+		case 4:  *dest++ = value; --count;
+		case 8:  *dest++ = value; --count;
+		case 12: *dest++ = value; --count;
+	}
+
+    // Call optimized version
+    memFill32SSE2(dest,&value,count);
+}
+
+ #else
+
+inline void memFill32(vplUint32* src,vplUint32 value,vplUint count)
+{
+    register vplUint n = (count + 7) / 8;
+
+    switch(count & 0x07)
+    {
+        case 0: do
+        {       *dest++ = src;
+        case 7: *dest++ = src;
+        case 6: *dest++ = src;
+        case 5: *dest++ = src;
+        case 4: *dest++ = src;
+        case 3: *dest++ = src;
+        case 2: *dest++ = src;
+        case 1: *dest++ = src;
+        } while (--n > 0);
+    }
+}
+
+#endif
 
 namespace vpl
 {
@@ -61,40 +120,10 @@ namespace vpl
 
     // Specialized version of memfill for 32 bit unsigned integers
     // Used in blendroutines, might be SSE2 accelerated
-    #ifdef USE_SSE2_
-
-    extern "C" void PRE_CDECL_ memFill32SSE2(vplUint32* dest,
-                                             vplUint32* value,
-                                             vplUint count) POST_CDECL_;
-
     inline void vplMemFill32(vplUint32* dest,vplUint32 value,vplUint count)
-    {
-        if(count < 7)
-            return vplMemFill(dest,value,count);
-
-		vplUint align = (vplPtr)(dest) & 0xf;
-		
-		switch (align) 
-		{
-			case 4:  *dest++ = value; --count;
-			case 8:  *dest++ = value; --count;
-			case 12: *dest++ = value; --count;
-		}
-
-        // Call optimized version
-        memFill32SSE2(dest,&value,count);
-    }
-
-    // Else fall back to our standard memfill
-    #else
-
-    inline void vplMemFill32(vplUint32* src,vplUint32 value,vplUint count)
-    {
-        vplMemFill(src,value,count);
-    }
-
-    #endif
-
+	{
+		memFill32(dest,value,count);
+	}
 
 	enum Alignment
 	{

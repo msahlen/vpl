@@ -192,44 +192,60 @@ memFill32SSE2:
       movd xmm0,[ARG2]     ; xmm0 = 0 0 0 color
       shufps xmm0,xmm0,0x0 ; xmm0 = color color color color
 
-      cmp ARG3,4
-      jl fill2
+	  cmp ARG3,64
+      jl fill32
 
-      cmp ARG3,8
-      jl fill4
+fill64:
+	  ; Write to memory
+	  movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0  
+      movaps [ARG1 + 48],xmm0  
+      movaps [ARG1 + 64],xmm0  
+      movaps [ARG1 + 80],xmm0  
+      movaps [ARG1 + 96],xmm0  
+      movaps [ARG1 + 112],xmm0  
+	  movaps [ARG1 + 128],xmm0  
+      movaps [ARG1 + 144],xmm0  
+      movaps [ARG1 + 160],xmm0  
+      movaps [ARG1 + 176],xmm0  
+      movaps [ARG1 + 192],xmm0  
+      movaps [ARG1 + 208],xmm0  
+      movaps [ARG1 + 224],xmm0  
+      movaps [ARG1 + 240],xmm0  
 
-      cmp ARG3,16
-      jl fill8
+	  ;Increase address, decrease remaining pixels
+      sub ARG3,64
+      add ARG1,256
 
-      cmp ARG3,32
-      jl fill16
+	  ; Loop?
+	  cmp ARG3,64
+      jge fill64
 
 fill32:
+	  cmp ARG3,32
+      jl fill16
 
-      movaps [ARG1],xmm0  ; Write result
-      movaps [ARG1 + 16],xmm0  ; Write result
-      movaps [ARG1 + 32],xmm0  ; Write result
-      movaps [ARG1 + 48],xmm0  ; Write result
-      movaps [ARG1 + 64],xmm0  ; Write result
-      movaps [ARG1 + 80],xmm0  ; Write result
-      movaps [ARG1 + 96],xmm0  ; Write result
-      movaps [ARG1 + 112],xmm0  ; Write result
+      movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0  
+      movaps [ARG1 + 48],xmm0  
+      movaps [ARG1 + 64],xmm0  
+      movaps [ARG1 + 80],xmm0  
+      movaps [ARG1 + 96],xmm0  
+      movaps [ARG1 + 112],xmm0 
 
       sub ARG3, 32
       add ARG1, 128
-
-      cmp ARG3,32
-      jge fill32
-
 
 fill16:
       cmp ARG3,16
       jl fill8
 
-      movaps [ARG1],xmm0  ; Write result
-      movaps [ARG1 + 16],xmm0  ; Write result
-      movaps [ARG1 + 32],xmm0  ; Write result
-      movaps [ARG1 + 48],xmm0  ; Write result
+      movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0 
+      movaps [ARG1 + 48],xmm0 
 
       sub ARG3, 16
       add ARG1, 64
@@ -238,8 +254,8 @@ fill8:
       cmp ARG3,8
       jl fill4
 
-      movaps [ARG1],xmm0  ; Write result
-      movaps [ARG1 + 16],xmm0  ; Write result
+      movaps [ARG1],xmm0 
+      movaps [ARG1 + 16],xmm0
 
       sub ARG3, 8
       add ARG1, 32
@@ -248,9 +264,8 @@ fill4:
       cmp ARG3,4
       jl fill2
 
-      movaps [ARG1],xmm0  ; Write result
-
-      ;Increase address, decrease remaining pixels
+      movaps [ARG1],xmm0  
+      
       sub ARG3, 4
       add ARG1, 16
 
@@ -258,9 +273,8 @@ fill2:
       cmp ARG3,2
       jl fill1
 
-      movq [ARG1],xmm0  ; Write result
+      movq [ARG1],xmm0
 
-      ;Increase address, decrease remaining pixels
       sub ARG3, 2
       add ARG1, 8
 
