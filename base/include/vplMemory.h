@@ -37,25 +37,10 @@ extern "C" void PRE_CDECL_ memFill32SSE2(vplUint32* dest,
 
 inline void memFill32(vplUint32* dest,vplUint32 value,vplUint count)
 {
-	// No need to call optimized version if count is small 
-    if(count < 7)
-	{
-        switch(count)
-		{
-			case 6: *dest++ = value;
-			case 5: *dest++ = value;
-			case 4: *dest++ = value;
-			case 3: *dest++ = value;
-			case 2: *dest++ = value;
-			case 1: *dest++ = value;
-		}
-		return;
-	}
-
 	// Align destination
 	vplUint align = (vplPtr)(dest) & 0xf;
 		
-	switch (align) 
+	switch(align) 
 	{
 		case 4:  *dest++ = value; --count;
 		case 8:  *dest++ = value; --count;
@@ -64,6 +49,14 @@ inline void memFill32(vplUint32* dest,vplUint32 value,vplUint count)
 
     // Call optimized version
     memFill32SSE2(dest,&value,count);
+}
+
+inline void alignOn16ByteBoundary(vplUint32** pointer,vplUint32 value,vplUint length)
+{
+	vplPtr alignedPointer = (vplPtr)(*pointer + 15) & ~15;
+
+	for(vplPtrDiff i = 0; i < alignedPointer - (vplPtr)(*pointer);i++)
+		**pointer++ = value;
 }
 
  #else
@@ -113,6 +106,7 @@ namespace vpl
         }
 	}
 
+	// Might be optimized in the future 
 	template <class T> inline void vplMemCopy(T* dest,const T* src,vplUint count)
 	{
 		std::memcpy(dest,src,count*sizeof(T));

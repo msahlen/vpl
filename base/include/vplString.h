@@ -44,6 +44,7 @@ namespace vpl
         }
         ~String(){}
 
+		// Getters
         inline vplUint getLength() const    
 		{
 			if(string_.getItemCount())
@@ -67,6 +68,7 @@ namespace vpl
 			return string_[i];
 		}
         
+		// Operators
         inline String& operator = (const char* string)
         {
             string_.clear();
@@ -100,6 +102,7 @@ namespace vpl
             return !(*this == string);
         }
 
+		// For appending strings
         inline void append(const char* string)
         {
             string_.removeLast();
