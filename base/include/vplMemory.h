@@ -39,8 +39,8 @@ inline void memFill32(vplUint32* dest,vplUint32 value,vplUint count)
 {
 	// Align destination
 	vplUint align = (vplPtr)(dest) & 0xf;
-		
-	switch(align) 
+
+	switch(align)
 	{
 		case 4:  *dest++ = value; --count;
 		case 8:  *dest++ = value; --count;
@@ -51,12 +51,17 @@ inline void memFill32(vplUint32* dest,vplUint32 value,vplUint count)
     memFill32SSE2(dest,&value,count);
 }
 
-inline void alignOn16ByteBoundary(vplUint32** pointer,vplUint32 value,vplUint length)
+inline void alignOn16ByteBoundary(vplUint32** pointer,vplUint32 value,vplUint& length)
 {
 	vplPtr alignedPointer = (vplPtr)(*pointer + 15) & ~15;
+    vplPtr endPointer = (vplPtr)(*pointer + length);
 
-	for(vplPtrDiff i = 0; i < alignedPointer - (vplPtr)(*pointer);i++)
-		**pointer++ = value;
+	while(vplPtr(*pointer) < alignedPointer &&
+          vplPtr(*pointer) < endPointer)
+    {
+        **pointer++ = value;
+        length++;
+    }
 }
 
  #else
@@ -106,7 +111,7 @@ namespace vpl
         }
 	}
 
-	// Might be optimized in the future 
+	// Might be optimized in the future
 	template <class T> inline void vplMemCopy(T* dest,const T* src,vplUint count)
 	{
 		std::memcpy(dest,src,count*sizeof(T));

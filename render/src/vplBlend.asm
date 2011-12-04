@@ -16,13 +16,20 @@
 
 %include "vplAsm.inc"
 
+section .data
+
+MASK: db 0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff
+HALF: db 0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80,0x00,0x80
+
+section .text
+
 global multiplyPixelsSSE2
 
 ;-----------------------------------------------------------------
 ; Function multiplyPixelsSSE2
 ;
 ; C prototype;
-; void multiplyPixelsSSE2(vplUint32* dest,vplUint32* color,vplUint32* alpha,vplUint* count)
+; void multiplyPixelsSSE2(vplUint32* dest,vplUint32* color,vplUint* count)
 ;
 ; Data must be aligned before calling this.
 
@@ -34,6 +41,18 @@ global multiplyPixelsSSE2
 ;			pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
 ;			pixel &= 0xff00ff00;
 ;			pixel |= t;
+
+multiplyPixelsSSE2:
+
+      enterFunction
+
+      movaps xmm0,[MASK] ; Mask in xmm0
+      movaps xmm1,[HALF] ; Constant in xmm1
+      movaps xmm2,[ARG1] ; 4 pixels in xmm2
+
+multiplyPixelsEnd:
+
+      leaveFunction
 
 section	.text
 
