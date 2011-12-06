@@ -54,7 +54,7 @@ namespace vpl
 
 		allEdges_.add(edges_);
 
-        memset(scanLines_,0x0,sizeof(Edge*)*numScanLines_);
+		vplMemFill(scanLines_,(Edge*)0x0,numScanLines_);
     }
 	void ScanLineList::clear()
 	{
@@ -71,7 +71,8 @@ namespace vpl
 
 		// Reset counter and scanline pointers
 		edgeCount_ = 0;
-		memset(scanLines_,0x0,sizeof(Edge*)*numScanLines_);
+
+		vplMemFill(scanLines_,(Edge*)0x0,numScanLines_);
 	}
     // Insert edge into scanline list
 	void ScanLineList::insert(const Edge& edge)

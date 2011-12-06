@@ -189,8 +189,8 @@ memFill32SSE2:
       enterFunction
 
       ; Load data and shuffle data
-      movd xmm0,[ARG2]     ; xmm0 = 0 0 0 color
-      shufps xmm0,xmm0,0x0 ; xmm0 = color color color color
+      movd xmm0,[ARG2]     ; xmm0 = 0 0 0 value
+      shufps xmm0,xmm0,0x0 ; xmm0 = value value value value
 
 	  cmp ARG3,64
       jl fill32
@@ -288,5 +288,3 @@ fill1:
 fillEnd:
 
       leaveFunction
-
-section	.data
