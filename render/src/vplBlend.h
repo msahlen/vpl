@@ -21,24 +21,6 @@
 #include "vplRender.h"
 #include "vplColorHelper.h"
 
-#ifdef USE_SSE2_
-
-extern "C" void PRE_CDECL_ multiplyPixelsSSE2(vplUint32* dest,
-	                                          vplUint32* color,
-											  vplUint* count) POST_CDECL_;
-
-inline void batchMultiplyPixels(vplUint32* dest,vplUint32 color,vplUint count)
-{
-}
-
- #else
-
-inline void batchMultiplyPixels(vplUint32* dest,vplUint32 color,vplUint count)
-{
-}
-
-#endif
-
 namespace vpl
 {
     // Blenders

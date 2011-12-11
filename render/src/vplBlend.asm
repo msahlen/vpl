@@ -24,7 +24,7 @@ NEG : db 0x00,0x00,0x00,0xff,0x00,0x00,0x00,0xff,0x00,0x00,0x00,0xff,0x00,0x00,0
 
 section .text
 
-global multiplyPixelsSSE2
+global blendSrcOverDestSSE2
 
 ;-----------------------------------------------------------------
 ; Function multiplyPixelsSSE2
@@ -35,28 +35,28 @@ global multiplyPixelsSSE2
 ; Data must be aligned before calling this.
 
 ; C code for this function
-; vplUint t = (pixel & 0xff00ff) * alpha;
+; vplUint t = (pixel & 0xff00ff) * oneMinusAlpha;
 ;			t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
 ;			t &= 0xff00ff;
-;			pixel = ((pixel >> 8) & 0xff00ff) * alpha;
+;			pixel = ((pixel >> 8) & 0xff00ff) * oneMinusAlpha;
 ;			pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
 ;			pixel &= 0xff00ff00;
 ;			pixel |= t;
 ;
 ;           return pixel;
 
-multiplyPixelsSSE2:
+blendSrcOverDestSSE2:
 
       enterFunction
 
 	  cmp ARG3,4
-      jl multiplyPixels2
+      jl blendSrcOverDest2
 
 	  movaps xmm0,[MASK] ; Mask in xmm0
 	  movaps xmm1,[HALF] ; Constant in xmm1
 	  movaps xmm7,[NEG]  ; Negation mask in xmm7
 
-multiplyPixels4:
+blendSrcOverDest4:
 
 	  ; Load data
 	  movaps xmm2,[ARG1] ; 4 pixels in xmm2
@@ -98,12 +98,12 @@ multiplyPixels4:
 	  sub ARG3, 4
 
 	  cmp ARG3,4
-      jge multiplyPixels4
+      jge blendSrcOverDest4
 
-multiplyPixels2:
-      
+blendSrcOverDest2:
+
 	  cmp ARG3,2
-      jl multiplyPixelsEnd
+      jl blendSrcOverDestEnd
 
 	  ; Load data
 	  movq xmm2,[ARG1] ; 2 pixels in xmm2
@@ -142,7 +142,7 @@ multiplyPixels2:
 	  ; decrease remaining pixels
 	  sub ARG3, 2
 
-multiplyPixelsEnd:
+blendSrcOverDestEnd:
 
       leaveFunction
 

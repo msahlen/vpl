@@ -26,23 +26,23 @@ namespace vpl
 	{
 		return ((color >> 24) & 0xFF);
 	}
-	
+
 	inline vplUchar getBlueChannelFromRGBA(vplUint32 color)
 	{
 		return ((color >> 16) & 0xFF);
 	}
-	
+
 	inline vplUchar getGreenChannelFromRGBA(vplUint32 color)
 	{
 		return ((color >> 8) & 0xFF);
 	}
-	
+
 	inline vplUchar getRedChannelFromRGBA(vplUint32 color)
 	{
 		return (color & 0xFF);
 	}
 
-	inline vplUint32 multiplyPixel(vplUint32 pixel,vplUint32 alpha,vplUint subShift)
+	inline vplUint32 multiplyPixel(vplUint32 pixel,vplUchar alpha,vplUint subShift)
     {
         vplUint32 c1 = (pixel & 0xff00ff) * alpha;
         vplUint32 c2 = ((pixel >> 8) & 0xff00ff) * alpha;
@@ -53,7 +53,7 @@ namespace vpl
         return c1 + c2;
     }
 
-    inline vplUint32 multiplyPixel(vplUint32 pixel, vplUint32 alpha)
+    inline vplUint32 multiplyPixel(vplUint32 pixel, vplUchar alpha)
     {
         if(alpha == 0)
 			return 0;
@@ -71,8 +71,8 @@ namespace vpl
 		}
     }
 
-    inline vplUint32 interpolatePixel(vplUint32 color1, vplUint32 alpha1,
-                                      vplUint32 color2, vplUint32 alpha2)
+    inline vplUint32 interpolatePixel(vplUint32 color1, vplUchar alpha1,
+                                      vplUint32 color2, vplUchar alpha2)
     {
         vplUint t = (color1 & 0xff00ff) * alpha1 + (color2 & 0xff00ff) * alpha2;
         t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
@@ -112,5 +112,28 @@ namespace vpl
 
         return ((alpha << 24)|(blue << 16)|(green << 8)|red);
     }
+
+    #ifdef USE_SSE2_
+
+    extern "C" void PRE_CDECL_ blendSrcOverDestSSE2(vplUint32* dest,
+                                                    vplUint32* color,
+                                                    vplUint* count) POST_CDECL_;
+
+    inline void blendSrcOverDest(vplUint32* dest,vplUint32 color,vplUint count)
+    {
+
+    }
+
+    #else
+
+    inline void blendSrcOverDest(vplUint32* dest,vplUint32 color,vplUint count)
+    {
+        vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color);
+
+        for(vplUint i = 0; i < count;i++)
+            dest[i] = color + multiplyPixel(dest[i],oneMinusAlpha);
+    }
+
+    #endif
 }
 #endif
