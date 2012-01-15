@@ -871,8 +871,7 @@ namespace vpl
 
             for(vplUint i = bottom ;i < top;i++)
             {
-                blender_.blend(target->getBuffer()  \
-					+ i*target->getWidth(),src.getBuffer() + i * src.getWidth(),count);
+                blender_.blend(target->getBuffer() + i*target->getWidth(),src.getBuffer() + i * src.getWidth(),count);
             }
         }
 

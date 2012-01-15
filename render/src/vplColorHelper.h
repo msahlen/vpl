@@ -112,28 +112,5 @@ namespace vpl
 
         return ((alpha << 24)|(blue << 16)|(green << 8)|red);
     }
-
-    #ifdef USE_SSE2_
-
-    extern "C" void PRE_CDECL_ blendSrcOverDestSSE2(vplUint32* dest,
-                                                    vplUint32* color,
-                                                    vplUint* count) POST_CDECL_;
-
-    inline void blendSrcOverDest(vplUint32* dest,vplUint32 color,vplUint count)
-    {
-
-    }
-
-    #else
-
-    inline void blendSrcOverDest(vplUint32* dest,vplUint32 color,vplUint count)
-    {
-        vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color);
-
-        for(vplUint i = 0; i < count;i++)
-            dest[i] = color + multiplyPixel(dest[i],oneMinusAlpha);
-    }
-
-    #endif
 }
 #endif
