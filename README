@@ -1,7 +1,7 @@
-VPL 0.2
+VPL 0.3
 
-VPL is a library to generate and manipulate vector paths as well as render them.
-The library is actually 2 libraries:
+VPL is a library to generate,manipulate and render vector paths.
+
 
 base:
 Path and 2d math(2d vectors, affine matrices).
@@ -21,5 +21,3 @@ cd build
 ccmake ..
 Choose configure options and generate
 make
-
-
