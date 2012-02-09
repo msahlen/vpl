@@ -23,11 +23,12 @@
 
 namespace vpl
 {   
-
+	// Base class for gradients
     class VPL_API Gradient
     {
     public:
 
+		// Gradient properties
         enum Spread
         {
             cPad = 0,
@@ -70,13 +71,30 @@ namespace vpl
 			}RadialGradientData;
 		};
 		
-		
+		static const int cGradientColorTableSize = 1024;
+		static const int cMaxGradientPixels = 8192;
 
-		Gradient():spread_(cPad),type_(cLinear){}
-        virtual ~Gradient(){}
+		Gradient():spread_(cPad),type_(cLinear),colorTable_(0),
+			       gradientPixels_(0),valid_(true){}
+        
+		virtual ~Gradient()
+		{
+			if(colorTable_)
+				delete [] colorTable_;
 
-        inline void setSpread(Spread spread) {spread_ = spread;}
-        inline Spread getSpread()            {return spread_;}
+			if(gradientPixels_)
+				delete [] gradientPixels_;
+		}
+
+        inline void setSpread(Spread spread) 
+		{
+			spread_ = spread;
+		}
+        
+		inline Spread getSpread()            
+		{
+			return spread_;
+		}
         
         inline void addStop(float offset,const Color& color)
         {
@@ -89,51 +107,78 @@ namespace vpl
                 offset = 0.0f;
             
             stops_.add(stop);
+
+			valid_ = false;
         }
         
-        inline Stop* getStops()           {return stops_.getContents();}
-        inline vplUint getNumberOfStops() {return stops_.getItemCount();}
-		inline Type getType()             {return type_;}
+		// Getters
+        inline Stop* getStops()           
+		{
+			return stops_.getContents();
+		}
+        
+		inline vplUint getNumberOfStops() 
+		{
+			return stops_.getItemCount();
+		}
+		
+		inline Type getType()             
+		{
+			return type_;
+		}
+
+		inline bool isValid()
+		{
+			return valid_;
+		}
+
+		void generateGradient();
+		virtual vplUint32* fetchGradient(vplUint x,vplUint y,vplUint length) = 0;
 
     protected:
-        
+
 		friend class Renderer;
 
         Spread spread_;
 		Type type_;
         DynamicArray<Stop> stops_;
 		Data data_;
+		vplUint32* colorTable_;
+        vplUint32* gradientPixels_;
+		bool valid_;
     };
     
-
+	// Specialiations
     class VPL_API LinearGradient:public Gradient
     {
         
     public:
 
-		LinearGradient(float x,float y,float dirX,float dirY)
-		{
-			type_ = cLinear;
-			data_.LinearGradientData.x_ = x;
-			data_.LinearGradientData.y_ = y;
-			data_.LinearGradientData.dirX_ = dirX;
-			data_.LinearGradientData.dirY_ = dirY;
-		}
+		LinearGradient(float x,float y,float dirX,float dirY);
+		~LinearGradient(){}
+
+		vplUint32* fetchGradient(vplUint x,vplUint y,vplUint length);
+
+	private:
+		 
+		 float deltaX_;
+         float deltaY_;
+         float length_;
+         float offset_;
     };
 
     class VPL_API RadialGradient:public Gradient
     {
     public:
 
-		RadialGradient(float cx,float cy,float fx,float fy,float radius)
-		{
-			type_ = cRadial;
-			data_.RadialGradientData.cx_ = cx;
-			data_.RadialGradientData.cy_ = cy;
-			data_.RadialGradientData.fx_ = fx;
-			data_.RadialGradientData.fy_ = fy;
-			data_.RadialGradientData.radius_ = radius;
-		}
+		RadialGradient(float cx,float cy,float fx,float fy,float radius);
+		~RadialGradient(){}
+
+		vplUint32* fetchGradient(vplUint x,vplUint y,vplUint length);
+
+	private:
+
+		float c_;
     };
 }
 

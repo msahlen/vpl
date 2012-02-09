@@ -75,7 +75,6 @@ namespace vpl
     public:
 
         EvenOddFiller(){}
-
         ~EvenOddFiller(){}
 
         void fill(PixelBuffer* target,
@@ -101,7 +100,7 @@ namespace vpl
             Edge* currentEdge = 0;
 
             // We use premultiplied alpha
-            vplUint32 color = blender.getBlendData()->color_;
+            vplUint32 color = blender.getColor();
 
             // Traverse scanlines
             for(int y = allEdges->getMin(); y <= allEdges->getMax(); ++y)
@@ -264,7 +263,6 @@ namespace vpl
         public:
 
             NonZeroFiller(){}
-
             ~NonZeroFiller(){}
 
 
@@ -296,7 +294,7 @@ namespace vpl
                 acc.initializeSubPixelBuffer(params.subPixelCount_);
 
                 // We use premultiplied alpha
-                vplUint32 color = blender.getBlendData()->color_;
+                vplUint32 color = blender.getColor();
 
                 // Traverse scanlines
                 for(int y = allEdges->getMin(); y <= allEdges->getMax(); ++y)
@@ -471,20 +469,22 @@ namespace vpl
     void composeBuffers(BlendMode blendMode,PixelBuffer* target,
                         const PixelBuffer& src,Rect rect);
 
-    void fillEvenOdd(PixelBuffer* target,ScanLineList* edges,
-                     BlendData& data,FillParameters& params,
+    void fillEvenOdd(BlendMode blendMode,PixelBuffer* target,
+					 ScanLineList* edges,vplUint32 color,FillParameters& params,
                      EvenOddMaskBuffer* evenOddMaskBuffer);
 
-    void gradientFillEvenOdd(PixelBuffer* target,ScanLineList* edges,
-                             BlendData& data,FillParameters& params,
+    void gradientFillEvenOdd(BlendMode blendMode,PixelBuffer* target,
+						     ScanLineList* edges,Gradient* gradient,
+							 FillParameters& params,
                              EvenOddMaskBuffer* evenOddMaskBuffer);
 
-    void fillNonZero(PixelBuffer* target,ScanLineList* edges,
-                     BlendData& data,FillParameters& params,
+    void fillNonZero(BlendMode blendMode,PixelBuffer* target,
+		             ScanLineList* edges,vplUint32 color,FillParameters& params,
                      NonZeroMaskBuffer* nonZeroMaskBuffer);
 
-    void gradientFillNonZero(PixelBuffer* target,ScanLineList* edges,
-                             BlendData& data,FillParameters& params,
+    void gradientFillNonZero(BlendMode blendMode,PixelBuffer* target,
+		                     ScanLineList* edges,Gradient* gradient,
+							 FillParameters& params,
                              NonZeroMaskBuffer* nonZeroMaskBuffer);
 
 }

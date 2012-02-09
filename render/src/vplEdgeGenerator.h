@@ -18,7 +18,6 @@
 #ifndef VPL_EDGE_GENERATOR_H_INCLUDED_
 #define VPL_EDGE_GENERATOR_H_INCLUDED_
 
-#include <climits>
 #include "vplConfig.h"
 #include "vplEdge.h"
 #include "vplPath.h"

@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 #include "SVGParser.h"
 

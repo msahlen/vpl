@@ -23,51 +23,6 @@
 
 namespace vpl
 {
-    static const int cGradientColorTableSize = 1024;
-    static const int cMaxGradientPixels      = 8192;
-
-    union GradientValues
-    {
-        struct
-        {
-            float deltaX_;
-            float deltaY_;
-            float length_;
-            float offset_;
-        }LinearGradientValues;
-
-        struct
-        {
-            float c_;
-        }RadialGradientValues;
-    };
-
-    struct BlendData
-    {
-		BlendData():spread_(Gradient::cPad),blendMode_(cClear),fetch_(0),color_(0){}
-        ~BlendData(){}
-
-        inline void fetchGradient(vplUint x,vplUint y,vplUint length)
-        {
-            fetch_(this,x,y,length);
-        }
-
-		typedef void (*GradientFetcher)(BlendData*,vplUint,vplUint,vplUint);
-
-        GradientValues gradientValues_;
-		Gradient::Type type_;
-        Gradient::Spread spread_;
-		Gradient::Data gradientData_;
-		BlendMode blendMode_;
-        GradientFetcher fetch_;
-        vplUint32 color_;
-        vplUint32 colorTable_[cGradientColorTableSize];
-        vplUint32 gradientPixels_[cMaxGradientPixels];
-		DynamicArray<Gradient::Stop> stops_;
-    };
-
-    void generateGradientData(BlendData& data);
-
     // Blenders
     // Porter Duff blending modes
     // Cd, Ad are the Component and Alpha of the destination pixel.
@@ -80,105 +35,61 @@ namespace vpl
     {
     public:
 
-        SrcBlender():blendData_(0){}
+        SrcBlender():color_(0){}
         ~SrcBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-            // Duff it
-            register vplUint n = (count + 7) / 8;
-
-            switch(count & 0x07)
-            {
-                case 0: do
-                {       *dest++ = blendData_->color_;
-                case 7: *dest++ = blendData_->color_;
-                case 6: *dest++ = blendData_->color_;
-                case 5: *dest++ = blendData_->color_;
-                case 4: *dest++ = blendData_->color_;
-                case 3: *dest++ = blendData_->color_;
-                case 2: *dest++ = blendData_->color_;
-                case 1: *dest++ = blendData_->color_;
-                } while (--n > 0);
-            }
+			vplMemFill32(dest,color_,count);
         }
+
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
-            // Duff it
-            register vplUint n = (count + 7) / 8;
-
-            switch(count & 0x07)
-            {
-                case 0: do
-                {       *dest++ = *src++;
-                case 7: *dest++ = *src++;
-                case 6: *dest++ = *src++;
-                case 5: *dest++ = *src++;
-                case 4: *dest++ = *src++;
-                case 3: *dest++ = *src++;
-                case 2: *dest++ = *src++;
-                case 1: *dest++ = *src++;
-                } while (--n > 0);
-            }
-
+            vplMemCopy(dest,src,count);
         }
 
-        inline void setBlendData(BlendData* blendData)
+        inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
+            color_ = color;
+		}
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API SrcGradientBlender
     {
     public:
 
-        SrcGradientBlender():blendData_(0){}
+        SrcGradientBlender():gradient_(0){}
         ~SrcGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
+			vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
-            blendData_->fetchGradient(x,y,count);
-
-             // Duff it
-            register vplUint n = (count + 7) / 8;
-
-            switch(count & 0x07)
-            {
-                case 0: do
-                {       *dest++ = *gradientPixels++;
-                case 7: *dest++ = *gradientPixels++;
-                case 6: *dest++ = *gradientPixels++;
-                case 5: *dest++ = *gradientPixels++;
-                case 4: *dest++ = *gradientPixels++;
-                case 3: *dest++ = *gradientPixels++;
-                case 2: *dest++ = *gradientPixels++;
-                case 1: *dest++ = *gradientPixels++;
-                } while (--n > 0);
-            }
+            vplMemCopy(dest,gradientPixels,count);
         }
-        inline void setBlendData(BlendData* blendData)
+
+        inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Destination blend is like a nop
@@ -188,51 +99,57 @@ namespace vpl
     {
     public:
 
-        DestBlender():blendData_(0){}
+        DestBlender():color_(0){}
         ~DestBlender(){}
 
         inline void blend(vplUint32*,vplUint,vplUint,vplUint) const
         {
         }
+
         void blend(vplUint32*,const vplUint32*,vplUint) const
         {
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API DestGradientBlender
     {
     public:
 
-        DestGradientBlender():blendData_(0){}
+        DestGradientBlender():gradient_(0){}
         ~DestGradientBlender(){}
 
         inline void blend(vplUint32*,vplUint,vplUint,vplUint) const
         {
         }
-        inline void setBlendData(BlendData* blendData)
+
+        inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
+            return 0;
         }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
-        }
+
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As + Ad * (1 - As)
@@ -241,67 +158,81 @@ namespace vpl
     {
     public:
 
-        SrcOverDestBlender():blendData_(0){}
+        SrcOverDestBlender():color_(0){}
         ~SrcOverDestBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-            for(vplUint i = 0; i < count; i++)
-            {
-                dest[i] = blendData_->color_ + multiplyPixel(dest[i],getAlphaChannelFromRGBA(~blendData_->color_));
-            }
+			vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color_);
+
+			if(0 == oneMinusAlpha)
+				vplMemFill32(dest,color_,count);
+			else
+			{
+				for(vplUint i = 0; i < count; i++)
+					dest[i] = color_ + multiplyPixel(dest[i],oneMinusAlpha);
+			}
         }
+
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
-            for(vplUint i = 0; i < count; i++)
-            {
-                dest[i] = src[i] + multiplyPixel(dest[i],getAlphaChannelFromRGBA(~src[i]));
-            }
+			vplUchar oneMinusAlpha = getAlphaChannelFromRGBA(~color_);
+
+			if(0 == oneMinusAlpha)
+				vplMemCopy(dest,src,count);
+			else
+			{
+				for(vplUint i = 0; i < count; i++)
+					dest[i] = src[i] + multiplyPixel(dest[i],oneMinusAlpha);
+			}
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API SrcOverDestGradientBlender
     {
     public:
 
-        SrcOverDestGradientBlender():blendData_(0){}
+        SrcOverDestGradientBlender():gradient_(0){}
         ~SrcOverDestGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
             {
-                dest[i] = gradientPixels[i] + multiplyPixel(dest[i],getAlphaChannelFromRGBA(~gradientPixels[i]));
+                dest[i] = gradientPixels[i] + \
+					multiplyPixel(dest[i],getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-    BlendData* blendData_;
+        Gradient* gradient_;
     };
     // Ar = As * (1 - Ad) + Ad
     // Cr = Cs * (1 - Ad) + Cd
@@ -309,71 +240,69 @@ namespace vpl
     {
     public:
 
-        DestOverSrcBlender():blendData_(0){}
+        DestOverSrcBlender():color_(0){}
         ~DestOverSrcBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-            {
-                vplUint32 destPixel = dest[i];
-                dest[i] = destPixel + multiplyPixel(blendData_->color_,getAlphaChannelFromRGBA(~destPixel));
-            }
+				dest[i] =  dest[i] + multiplyPixel(color_,getAlphaChannelFromRGBA(~dest[i]));
+
         }
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-            {
-                vplUint32 destPixel = dest[i];
-                dest[i] = destPixel + multiplyPixel(src[i],getAlphaChannelFromRGBA(~destPixel));
-            }
+				dest[i] = dest[i] + multiplyPixel(src[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
+            color_ = color;
+		}
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
-    };
+		vplUint32 color_;
+	};
 
     class VPL_API DestOverSrcGradientBlender
     {
     public:
 
-        DestOverSrcGradientBlender():blendData_(0){}
+        DestOverSrcGradientBlender():gradient_(0){}
         ~DestOverSrcGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = destPixel + multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(~destPixel));
+				dest[i] = dest[i] + \
+					multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(~dest[i]));
             }
 
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
+            return 0;
         }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
-        }
+
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As * Ad
@@ -382,74 +311,64 @@ namespace vpl
     {
     public:
 
-        SrcInDestBlender():blendData_(0){}
+        SrcInDestBlender():color_(0){}
         ~SrcInDestBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-            {
-                vplUint32 destPixel = dest[i];
-
-                dest[i] = multiplyPixel(blendData_->color_,getAlphaChannelFromRGBA(destPixel));
-            }
+                dest[i] = multiplyPixel(color_,getAlphaChannelFromRGBA( dest[i]));
         }
 
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-            {
-                vplUint32 destPixel = dest[i];
+				dest[i] = multiplyPixel(src[i],getAlphaChannelFromRGBA(dest[i]));
+        }
 
-                dest[i] = multiplyPixel(src[i],getAlphaChannelFromRGBA(destPixel));
-            }
-        }
-        inline void setBlendData(BlendData* blendData)
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
-};
+		vplUint32 color_;
+	};
 
     class VPL_API SrcInDestGradientBlender
     {
     public:
 
-        SrcInDestGradientBlender():blendData_(0){}
+        SrcInDestGradientBlender():gradient_(0){}
         ~SrcInDestGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+           vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
-            {
-                vplUint32 destPixel = dest[i];
+				dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(dest[i]));
+        }
 
-                dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(destPixel));
-            }
-        }
-        inline void setBlendData(BlendData* blendData)
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = Ad * As
@@ -458,14 +377,13 @@ namespace vpl
     {
     public:
 
-        DestInSrcBlender():blendData_(0){}
+        DestInSrcBlender():color_(0){}
         ~DestInSrcBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-                dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(blendData_->color_));
-
+                dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(color_));
         }
 
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
@@ -473,49 +391,51 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(src[i]));
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API DestInSrcGradientBlender
     {
     public:
 
-        DestInSrcGradientBlender():blendData_(0){}
+        DestInSrcGradientBlender():gradient_(0){}
         ~DestInSrcGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(gradientPixels[i]));
 
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As * (1 - Ad)
@@ -524,13 +444,13 @@ namespace vpl
     {
     public:
 
-        SrcOutDestBlender():blendData_(0){}
+        SrcOutDestBlender():color_(0){}
         ~SrcOutDestBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-                dest[i] = multiplyPixel(blendData_->color_,getAlphaChannelFromRGBA(~dest[i]));
+                dest[i] = multiplyPixel(color_,getAlphaChannelFromRGBA(~dest[i]));
         }
 
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
@@ -538,48 +458,50 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(src[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API SrcOutDestGradientBlender
     {
     public:
 
-        SrcOutDestGradientBlender():blendData_(0){}
+        SrcOutDestGradientBlender():gradient_(0){}
         ~SrcOutDestGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
-                dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(~dest[i]));
+				dest[i] = multiplyPixel(gradientPixels[i],getAlphaChannelFromRGBA(~dest[i]));
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = Ad * (1 - As)
@@ -588,13 +510,13 @@ namespace vpl
     {
     public:
 
-        DestOutSrcBlender():blendData_(0){}
+        DestOutSrcBlender():color_(0){}
         ~DestOutSrcBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
-                dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(~blendData_->color_));
+                dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(~color_));
         }
 
         inline void blend(vplUint32* dest,const vplUint32* src,vplUint count) const
@@ -602,48 +524,53 @@ namespace vpl
             for(vplUint i = 0; i < count; i++)
                 dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(~src[i]));
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API DestOutSrcGradientBlender
     {
     public:
 
-        DestOutSrcGradientBlender():blendData_(0){}
+        DestOutSrcGradientBlender():gradient_(0){}
         ~DestOutSrcGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+           vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
-                dest[i] = multiplyPixel(dest[i],getAlphaChannelFromRGBA(~gradientPixels[i]));
+			{
+                dest[i] = multiplyPixel(dest[i],
+					                    getAlphaChannelFromRGBA(~gradientPixels[i]));
+			}
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As * Ad + Ad * (1 - As)
@@ -653,16 +580,19 @@ namespace vpl
     {
     public:
 
-        SrcAtopDestBlender():blendData_(0){}
+        SrcAtopDestBlender():color_(0){}
         ~SrcAtopDestBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-            vplUint32 inverseAlpha = getAlphaChannelFromRGBA(~blendData_->color_);
+            vplUint32 inverseAlpha = getAlphaChannelFromRGBA(~color_);
 
             for(vplUint i = 0; i < count; i++)
             {
-                dest[i] = interpolatePixel(blendData_->color_,getAlphaChannelFromRGBA(dest[i]),dest[i],inverseAlpha);
+                dest[i] = interpolatePixel(color_,
+					                       getAlphaChannelFromRGBA(dest[i]),
+										   dest[i],
+										   inverseAlpha);
             }
 
         }
@@ -671,53 +601,60 @@ namespace vpl
         {
             for(vplUint i = 0; i < count; i++)
             {
-                dest[i] = interpolatePixel(src[i],getAlphaChannelFromRGBA(dest[i]),dest[i],getAlphaChannelFromRGBA(~src[i]));
+                dest[i] = interpolatePixel(src[i],
+					                       getAlphaChannelFromRGBA(dest[i]),
+										   dest[i],getAlphaChannelFromRGBA(~src[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
-    };
+		vplUint32 color_;
+	};
 
     class VPL_API SrcAtopDestGradientBlender
     {
     public:
 
-        SrcAtopDestGradientBlender():blendData_(0){}
+        SrcAtopDestGradientBlender():gradient_(0){}
         ~SrcAtopDestGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+           vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
             {
-                dest[i] = interpolatePixel(gradientPixels[i],getAlphaChannelFromRGBA(dest[i]),dest[i],getAlphaChannelFromRGBA(~gradientPixels[i]));
+                dest[i] = interpolatePixel(gradientPixels[i],
+					                       getAlphaChannelFromRGBA(dest[i]),
+										   dest[i],
+										   getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As * (1 - Ad) + Ad * As
@@ -727,15 +664,17 @@ namespace vpl
     {
     public:
 
-        DestAtopSrcBlender():blendData_(0){}
+        DestAtopSrcBlender():color_(0){}
         ~DestAtopSrcBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(destPixel,getAlphaChannelFromRGBA(blendData_->color_),blendData_->color_, getAlphaChannelFromRGBA(~destPixel));
+                dest[i] = interpolatePixel(dest[i],
+					                       getAlphaChannelFromRGBA(color_),
+										   color_,
+										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
 
@@ -743,55 +682,61 @@ namespace vpl
         {
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(destPixel,getAlphaChannelFromRGBA(src[i]),src[i], getAlphaChannelFromRGBA(~destPixel));
+                dest[i] = interpolatePixel(dest[i],
+					                       getAlphaChannelFromRGBA(src[i]),
+										   src[i],
+										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
     };
 
     class VPL_API DestAtopSrcGradientBlender
     {
     public:
 
-        DestAtopSrcGradientBlender():blendData_(0){}
+        DestAtopSrcGradientBlender():gradient_(0){}
         ~DestAtopSrcGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(destPixel,getAlphaChannelFromRGBA(gradientPixels[i]),gradientPixels[i], getAlphaChannelFromRGBA(~destPixel));
+                dest[i] = interpolatePixel(dest[i],
+					                       getAlphaChannelFromRGBA(gradientPixels[i]),
+										   gradientPixels[i],
+										   getAlphaChannelFromRGBA(~dest[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
     // Ar = As * (1 - Ad) + Ad * (1 - As)
@@ -800,17 +745,19 @@ namespace vpl
     {
     public:
 
-        SrcXorDestBlender():blendData_(0){}
+        SrcXorDestBlender():color_(0){}
         ~SrcXorDestBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-            vplUint32 inverseAlpha = getAlphaChannelFromRGBA(~blendData_->color_);
+            vplUint32 inverseAlpha = getAlphaChannelFromRGBA(~color_);
 
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(blendData_->color_,getAlphaChannelFromRGBA(~destPixel),destPixel,inverseAlpha);
+                dest[i] = interpolatePixel(color_,
+					                       getAlphaChannelFromRGBA(~dest[i]),
+										   dest[i],
+										   inverseAlpha);
             }
         }
 
@@ -818,140 +765,119 @@ namespace vpl
         {
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(src[i],getAlphaChannelFromRGBA(~destPixel),destPixel,getAlphaChannelFromRGBA(~src[i]));
+                dest[i] = interpolatePixel(src[i],
+					                       getAlphaChannelFromRGBA(~dest[i]),
+										   dest[i],
+										   getAlphaChannelFromRGBA(~src[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
     private:
 
-        BlendData* blendData_;
-    };
+		vplUint32 color_;
+	};
 
     class VPL_API SrcXorDestGradientBlender
     {
     public:
 
-        SrcXorDestGradientBlender():blendData_(0){}
+        SrcXorDestGradientBlender():gradient_(0){}
         ~SrcXorDestGradientBlender(){}
 
         inline void blend(vplUint32* dest,vplUint x,vplUint y,vplUint count) const
         {
-            vplUint32* gradientPixels = blendData_->gradientPixels_;
-
-            blendData_->fetchGradient(x,y,count);
+            vplUint32* gradientPixels = gradient_->fetchGradient(x,y,count);
 
             for(vplUint i = 0; i < count; i++)
             {
-                vplUint32 destPixel = dest[i];
-                dest[i] = interpolatePixel(gradientPixels[i],getAlphaChannelFromRGBA(~destPixel),destPixel,getAlphaChannelFromRGBA(~gradientPixels[i]));
+                dest[i] = interpolatePixel(gradientPixels[i],
+					                       getAlphaChannelFromRGBA(~dest[i]),
+										   dest[i],
+										   getAlphaChannelFromRGBA(~gradientPixels[i]));
             }
         }
-        inline void setBlendData(BlendData* blendData)
+
+		inline void setGradient(Gradient* gradient)
+		{
+			gradient_ = gradient;
+		}
+
+		inline vplUint32 getColor()
         {
-            blendData_ = blendData;
-        }
-        inline BlendData* getBlendData()
-        {
-            return blendData_;
+            return 0;
         }
 
     private:
 
-        BlendData* blendData_;
+        Gradient* gradient_;
     };
 
+	// Ar = 0
+    // Cr = 0
     class VPL_API ClearBlender
     {
     public:
 
-        ClearBlender():blendData_(0){}
+        ClearBlender():color_(0){}
         ~ClearBlender(){}
 
         inline void blend(vplUint32* dest,vplUint,vplUint,vplUint count) const
         {
-            // Duff it
-            register vplUint n = (count + 7) / 8;
-
-            switch(count & 0x07)
-            {
-                case 0: do
-                {       *dest++ = 0;
-                case 7: *dest++ = 0;
-                case 6: *dest++ = 0;
-                case 5: *dest++ = 0;
-                case 4: *dest++ = 0;
-                case 3: *dest++ = 0;
-                case 2: *dest++ = 0;
-                case 1: *dest++ = 0;
-                } while (--n > 0);
-            }
+           vplMemFill32(dest,(vplUint32)0,count);
         }
 
         inline void blend(vplUint32* dest,const vplUint32*,vplUint count) const
         {
-            // Duff it
-            register vplUint n = (count + 7) / 8;
-
-            switch(count & 0x07)
-            {
-                case 0: do
-                {       *dest++ = 0;
-                case 7: *dest++ = 0;
-                case 6: *dest++ = 0;
-                case 5: *dest++ = 0;
-                case 4: *dest++ = 0;
-                case 3: *dest++ = 0;
-                case 2: *dest++ = 0;
-                case 1: *dest++ = 0;
-                } while (--n > 0);
-            }
+           vplMemFill32(dest,(vplUint32)0,count);
         }
 
-        inline void setBlendData(BlendData* blendData)
+        inline void setColor(vplUint32 color)
         {
-            blendData_ = blendData;
+            color_ = color;
         }
-        inline BlendData* getBlendData()
+
+		inline vplUint32 getColor()
         {
-            return blendData_;
+            return color_;
         }
 
-     private:
+    private:
 
-        BlendData* blendData_;
+		vplUint32 color_;
      };
 
      template<typename T> class VPL_API Composer
      {
-         public:
+	 public:
 
-             Composer(){}
-             ~Composer(){}
+		Composer(){}
+        ~Composer(){}
 
-             inline void compose(PixelBuffer* target,const PixelBuffer& src,Rect rect)
-             {
-                 vplUint bottom = static_cast<vplUint>(rect.bottom_);
-                 vplUint top    = static_cast<vplUint>(rect.top_);
-                 vplUint count  = static_cast<vplUint>(rect.right_ - rect.left_);
+        inline void compose(PixelBuffer* target,const PixelBuffer& src,Rect rect)
+        {
+            vplUint bottom = static_cast<vplUint>(rect.bottom_);
+            vplUint top    = static_cast<vplUint>(rect.top_);
+            vplUint count  = static_cast<vplUint>(rect.right_ - rect.left_);
 
-                 for(vplUint i = bottom ;i < top;i++)
-                 {
-                     blender_.blend(target->getBuffer()  + i*target->getWidth(),src.getBuffer() + i * src.getWidth(),count);
-                 }
-             }
+            for(vplUint i = bottom ;i < top;i++)
+            {
+                blender_.blend(target->getBuffer() + i*target->getWidth(),src.getBuffer() + i * src.getWidth(),count);
+            }
+        }
 
-         private:
+    private:
 
-             T blender_;
+        T blender_;
      };
 }
 #endif

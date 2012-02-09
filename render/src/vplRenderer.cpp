@@ -82,13 +82,13 @@ namespace vpl
 	void Renderer::initialize()
     {
 		// Initalize
-        width_  = target_->getWidth();
+        width_ = target_->getWidth();
         height_ = target_->getHeight();
 
         // Set initial clipping rectangle
-        clipRect_.left_   = 0.0f;
-        clipRect_.right_  = static_cast<float>(width_);
-        clipRect_.top_    = static_cast<float>(height_);
+        clipRect_.left_ = 0.0f;
+        clipRect_.right_ = static_cast<float>(width_);
+        clipRect_.top_ = static_cast<float>(height_);
         clipRect_.bottom_ = 0.0f;
 
         edgeGenerator_->setClipRect(clipRect_);
@@ -105,30 +105,36 @@ namespace vpl
 
 		transformUpdated_ = true;
     }
+	
 	void Renderer::setTransform(const AffineMatrix& transform)
 	{
 		transform_ = transform;
 
 		transformUpdated_ = true;
 	}
+	
 	void Renderer::transform(const AffineMatrix& transform)
 	{
 		transform_ *= transform;
 
 		transformUpdated_ = true;
 	}
+	
 	PathReference* Renderer::addPath(const Path* path,const Pen* pen)
 	{
 		return allocateReference(path,pen,0);
 	}
-    PathReference* Renderer::addPath(const Path* path,const Brush* brush)
+    
+	PathReference* Renderer::addPath(const Path* path,const Brush* brush)
 	{
 		return allocateReference(path,0,brush);
 	}
-    PathReference* Renderer::addPath(const Path* path,const Pen* pen,const Brush* brush)
+    
+	PathReference* Renderer::addPath(const Path* path,const Pen* pen,const Brush* brush)
 	{
 		return allocateReference(path,pen,brush);
 	}
+	
 	PathReference* Renderer::allocateReference(const Path* path,const Pen* pen,const Brush* brush)
 	{
 		PathReference* ref = new PathReference();
@@ -155,6 +161,7 @@ namespace vpl
 
 		return ref;
 	}
+	
 	// Deallocate data used for edge generation
 	void Renderer::deAllocateReference(PathReference* reference)
 	{
@@ -167,6 +174,7 @@ namespace vpl
         if(reference->generator_)
             delete reference->generator_;
 	}
+	
 	// Use reference to remove path
     void Renderer::removePath(PathReference** reference)
 	{
@@ -215,7 +223,8 @@ namespace vpl
 
         targetUpdated_ = true;
 	}
-    void Renderer::compose(const PixelBuffer& src,BlendMode blendMode,
+    
+	void Renderer::compose(const PixelBuffer& src,BlendMode blendMode,
                            vplUint offsetX,vplUint offsetY)
 	{
         Rect destRect(0.0f,static_cast<float>(width_),
@@ -280,19 +289,6 @@ namespace vpl
         reference->path_->segmentsValid_ = true;
 	}
 
-	void Renderer::setGradientData(BlendData& data,const Gradient* gradient)
-	{
-		data.gradientData_  = gradient->data_;
-		data.spread_ = gradient->spread_;
-		data.type_ = gradient->type_;
-
-		const Gradient::Stop* stops = gradient->stops_.getContents();
-
-		for(unsigned int i = 0; i < gradient->stops_.getItemCount();i++)
-			data.stops_.add(*stops++);
-
-		generateGradientData(data);
-	}
     // See if we need to regenerate paths
 	void Renderer::updatePathEdges()
 	{
@@ -311,23 +307,35 @@ namespace vpl
 
 		transformUpdated_ = false;
 	}
-    void Renderer::fill(Brush::FillMode fillMode,
-                        BlendData& data,
-                        ScanLineList* scanLines)
+	// Choose correct fill function
+    void Renderer::fill(BlendMode blendMode,Brush::FillMode fillMode,vplUint32 color,
+				        Gradient* gradient,ScanLineList* scanLines)
     {
         if(fillMode == Brush::cEvenOdd)
 		{
-            if(data.fetch_ != 0)
-                gradientFillEvenOdd(target_,scanLines,data,*fillParameters_,evenOddMaskBuffer_);
+            if(gradient)
+			{
+                gradientFillEvenOdd(blendMode,target_,scanLines,gradient,
+					                *fillParameters_,evenOddMaskBuffer_);
+			}
 			else
-                fillEvenOdd(target_,scanLines,data,*fillParameters_,evenOddMaskBuffer_);
+			{
+                fillEvenOdd(blendMode,target_,scanLines,color,
+					        *fillParameters_,evenOddMaskBuffer_);
+			}
 		}
 		else
 		{
-			if(data.fetch_ != 0)
-                gradientFillNonZero(target_,scanLines,data,*fillParameters_,nonZeroMaskBuffer_);
+			if(gradient)
+			{
+                gradientFillNonZero(blendMode,target_,scanLines,gradient,
+					                *fillParameters_,nonZeroMaskBuffer_);
+			}
 			else
-				fillNonZero(target_,scanLines,data,*fillParameters_,nonZeroMaskBuffer_);
+			{
+				fillNonZero(blendMode,target_,scanLines,color,
+					        *fillParameters_,nonZeroMaskBuffer_);
+			}
 		}
     }
 
@@ -344,33 +352,21 @@ namespace vpl
             // Fill
 			if((*it)->fillEdges_)
 			{
-				// Set data for blending
-				BlendData data;
-				data.color_ = preMultiplyColorRGBA((*it)->brush_.getColorAsRGBA());
-				data.blendMode_ = (*it)->brush_.getBlendMode();
-
-				// Copy stops and gradient data if using a gradient
-				const Gradient* gradient = (*it)->brush_.getGradient();
-				if(gradient)
-					setGradientData(data,gradient);
-
-                fill((*it)->brush_.getFillMode(),data,(*it)->fillEdges_);
+                fill((*it)->brush_.getBlendMode(),
+					 (*it)->brush_.getFillMode(),
+					 preMultiplyColorRGBA((*it)->brush_.getColorAsRGBA()),
+					 (*it)->brush_.getGradient(),
+					 (*it)->fillEdges_);
 			}
 
 			// Stroke
 			if((*it)->strokeEdges_)
 			{
-				// Set data for blending
-				BlendData data;
-				data.color_ = preMultiplyColorRGBA((*it)->pen_.getColorAsRGBA());
-				data.blendMode_ = (*it)->pen_.getBlendMode();
-
-				// Copy stops and gradient data if using a gradien
-				const Gradient* gradient = (*it)->pen_.getGradient();
-				if(gradient)
-					setGradientData(data,gradient);
-
-				fill(Brush::cNonZero,data,(*it)->strokeEdges_);
+				fill((*it)->pen_.getBlendMode(),
+					 Brush::cNonZero,
+					 preMultiplyColorRGBA((*it)->pen_.getColorAsRGBA()),
+					 (*it)->pen_.getGradient(),
+					 (*it)->strokeEdges_);
 			}
 
             // Add to references
@@ -412,33 +408,21 @@ namespace vpl
 				// Fill
 				if((*it)->fillEdges_)
 				{
-					// Set data for blending
-					BlendData data;
-					data.color_ = preMultiplyColorRGBA((*it)->brush_.getColorAsRGBA());
-					data.blendMode_ = (*it)->brush_.getBlendMode();
-
-					// Copy stops and gradient data if using a gradient
-					const Gradient* gradient = (*it)->brush_.getGradient();
-					if(gradient)
-						setGradientData(data,gradient);
-
-                    fill((*it)->brush_.getFillMode(),data,(*it)->fillEdges_);
+					 fill((*it)->brush_.getBlendMode(),
+					      (*it)->brush_.getFillMode(),
+					      preMultiplyColorRGBA((*it)->brush_.getColorAsRGBA()),
+					      (*it)->brush_.getGradient(),
+					      (*it)->fillEdges_);
 				}
 
 				// Stroke
 				if((*it)->strokeEdges_)
 				{
-					// Set data for blending
-					BlendData data;
-					data.color_ = preMultiplyColorRGBA((*it)->pen_.getColorAsRGBA());
-					data.blendMode_ = (*it)->pen_.getBlendMode();
-
-					// Copy stops and gradient data if using a gradien
-					const Gradient* gradient = (*it)->pen_.getGradient();
-					if(gradient)
-					    setGradientData(data,gradient);
-
-					fill(Brush::cNonZero,data,(*it)->strokeEdges_);
+					fill((*it)->pen_.getBlendMode(),
+					     Brush::cNonZero,
+					     preMultiplyColorRGBA((*it)->pen_.getColorAsRGBA()),
+					     (*it)->pen_.getGradient(),
+					     (*it)->strokeEdges_);
 				}
 				// Move to next
 				++it;

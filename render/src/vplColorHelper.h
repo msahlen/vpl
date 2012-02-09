@@ -20,26 +20,29 @@
 
 #include "vplConfig.h"
 
-static inline vplUchar getAlphaChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 24) & 0xFF);
-}
-static inline vplUchar getBlueChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 16) & 0xFF);
-}
-static inline vplUchar getGreenChannelFromRGBA(vplUint32 color)
-{
-    return ((color >> 8) & 0xFF);
-}
-static inline vplUchar getRedChannelFromRGBA(vplUint32 color)
-{
-    return (color & 0xFF);
-}
-
 namespace vpl
 {
-    inline vplUint32 multiplyPixel(vplUint32 pixel,vplUint32 alpha,vplUint subShift)
+	inline vplUchar getAlphaChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 24) & 0xFF);
+	}
+
+	inline vplUchar getBlueChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 16) & 0xFF);
+	}
+
+	inline vplUchar getGreenChannelFromRGBA(vplUint32 color)
+	{
+		return ((color >> 8) & 0xFF);
+	}
+
+	inline vplUchar getRedChannelFromRGBA(vplUint32 color)
+	{
+		return (color & 0xFF);
+	}
+
+	inline vplUint32 multiplyPixel(vplUint32 pixel,vplUchar alpha,vplUint subShift)
     {
         vplUint32 c1 = (pixel & 0xff00ff) * alpha;
         vplUint32 c2 = ((pixel >> 8) & 0xff00ff) * alpha;
@@ -50,21 +53,26 @@ namespace vpl
         return c1 + c2;
     }
 
-    inline vplUint32 multiplyPixel(vplUint32 pixel, vplUint32 alpha)
+    inline vplUint32 multiplyPixel(vplUint32 pixel, vplUchar alpha)
     {
-        vplUint t = (pixel & 0xff00ff) * alpha;
-        t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
-        t &= 0xff00ff;
-        pixel = ((pixel >> 8) & 0xff00ff) * alpha;
-        pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
-        pixel &= 0xff00ff00;
-        pixel |= t;
+        if(alpha == 0)
+			return 0;
+		else
+		{
+			vplUint t = (pixel & 0xff00ff) * alpha;
+			t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
+			t &= 0xff00ff;
+			pixel = ((pixel >> 8) & 0xff00ff) * alpha;
+			pixel = (pixel + ((pixel >> 8) & 0xff00ff) + 0x800080);
+			pixel &= 0xff00ff00;
+			pixel |= t;
 
-        return pixel;
+			return pixel;
+		}
     }
 
-    inline vplUint32 interpolatePixel(vplUint32 color1, vplUint32 alpha1,
-                                      vplUint32 color2, vplUint32 alpha2)
+    inline vplUint32 interpolatePixel(vplUint32 color1, vplUchar alpha1,
+                                      vplUint32 color2, vplUchar alpha2)
     {
         vplUint t = (color1 & 0xff00ff) * alpha1 + (color2 & 0xff00ff) * alpha2;
         t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;

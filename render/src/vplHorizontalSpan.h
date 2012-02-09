@@ -32,7 +32,8 @@ namespace vpl
             max_ = INT_MIN;
             min_ = INT_MAX;
         }
-        inline void mark(int start,int end)
+        
+		inline void mark(int start,int end)
         {
             if(end < start)
                 mark(end,start);
@@ -45,8 +46,16 @@ namespace vpl
                     max_= end;
             }
         }
-        inline int getMax() {return max_;}
-        inline int getMin() {return min_;}
+
+		inline int getMax() 
+		{
+			return max_;
+		}
+        
+		inline int getMin() 
+		{
+			return min_;
+		}
 
     private:
 

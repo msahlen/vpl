@@ -1,40 +1,36 @@
+; VPL - Vector path library
+; Copyright (C) 2009 - 2011 Mattias Sahlén <Mattias Sahlén <mattias.sahlen@gmail.com>>
+; This library is free software; you can redistribute it and/or
+; modify it under the terms of the GNU General General Public
+; License as published by the Free Software Foundation; either
+; version 2.1 of the License, or (at your option) any later version.
+
+; This library is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+; General General Public License for more details.
+
+; You should have received a copy of the GNU General General Public
+; License along with this library;
+; if not, see <http://www.gnu.org/licenses/>.
+
+%include "vplAsm.inc"
+
 section	.text
 
 ; Exported functions
-global transformSSE
+global batchTransform
 global estimateFlatness
+global memFill32SSE2
 
-; Calling convention for Windows 64bit:
-; The registers RCX, RDX, R8, R9 are used for integer and pointer arguments (in that order left to right),
-; and XMM0, XMM1, XMM2, XMM3 are used for floating point arguments
-
-; Calling conventions for Linux:
-; The registers RDI, RSI, RDX, RCX, R8 and R9 are used for integer and pointer arguments
-; while XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6 and XMM7 are used for floating point arguments.
-; For system calls, R10 is used instead of RCX.[9] As in the Microsoft x64 calling convention,
-; additional arguments are pushed onto the stack and the return value is stored in RAX.
-
-%ifdef WIN64
-
-%define ARG1 rcx
-%define ARG2 rdx
-%define ARG3 r8
-%define ARG4 r9
-
-%else
-
-%define ARG1 rdi
-%define ARG2 rsi
-%define ARG3 rdx
-%define ARG4 rcx
-
-%endif
-
-; function transformSSE
+; -----------------------------------------------------------
+; function batchTransform
+;
 ; transform an array of vectors
+;
 ; C prototype;
-; void transformSSE(float* transform,float* vectors,unsigned int numVectors)
-
+; void batchTransform(float* transform,float* vectors,unsigned int numVectors)
+;
 ; Matrix layout
 ; SX  transform[0]
 ; SHX transform[1]
@@ -42,19 +38,15 @@ global estimateFlatness
 ; SHY transform[3]
 ; SY  transform[4]
 ; TY  transform[5]
+;
+; Formula :
+; new x = x * SX  + y_ * SHX + TX;
+; new y = x * SHY + y_ * SY  + TY;
+; -----------------------------------------------------------
 
-;new_x = x * SX  + y_ * SHX + TX;
-;new_y = x * SHY + y_ * SY  + TY;
+batchTransform:
 
-transformSSE:
-
-	  push	rbp
-	  mov	rax,rsp		    ; rax = original rbp
-	  sub	rsp, byte 4
-	  and	rsp, byte (-16)	; align to 128 bits
-	  mov	[rsp],rax
-	  mov	rbp,rsp		    ; rbp = aligned rbp
-	  lea	rsp, [rbp - 32] ; assign the frame pointer with a bias of 32
+	  enterFunction
 
 	  ; Arguments:
       ; matrix pointer in ARG1
@@ -119,16 +111,15 @@ doOne:
 
 transformEnd:
 
-	  mov	rsp,rbp ; rsp <- aligned rbp
-	  pop	rsp		; rsp <- original rbp
-	  pop	rbp
-	  ret
+	  leaveFunction
 
-
+; -----------------------------------------------------------
 ; function estimateFlatness
+;
 ; C prototype;
 ; void estimateFlatness(float* bezier,float* deltas)
-; Data stored like:
+;
+; bezier legend:
 ; bezier[0] = from.x_;
 ; bezier[1] = from.y_;
 ; bezier[2] = control1.x_;
@@ -143,16 +134,11 @@ transformEnd:
 ; p2 = control1;
 ; p3 = control2;
 ; p4 = to;
+; -----------------------------------------------------------
 
 estimateFlatness:
 
-	  push	rbp
-	  mov	rax,rsp		    ; rax = original rbp
-	  sub	rsp, byte 4
-	  and	rsp, byte (-16)	; align to 128 bits
-	  mov	[rsp],rax
-	  mov	rbp,rsp		    ; rbp = aligned rbp
-	  lea	rsp, [rbp - 32] ; assign the frame pointer with a bias of 32
+	  enterFunction
 
 	  ; Arguments:
       ; Pointer to bezier points in ARG1
@@ -161,7 +147,7 @@ estimateFlatness:
       ; Load bezier and estimate flatness of curve
       movaps xmm0,[ARG1]       ; xmm0 = p2.y p2.x p1.y p1.x
       movaps xmm1,[ARG1 + 16]  ; xmm1 = p4.y p4.x p3.y p3.x
-      movaps xmm2, xmm0       ; xmm2 = p2.y p2.x p1.y p1.x
+      movaps xmm2, xmm0        ; xmm2 = p2.y p2.x p1.y p1.x
 
       ; Reorder data
       shufps xmm2,xmm1,0xE4   ; xmm2 = p4.y p4.x p1.y p1.x
@@ -187,9 +173,118 @@ estimateFlatness:
       mulps xmm0,xmm0         ; xmm0   = dy2 dx2 dy1 dx1
       movaps [ARG2],xmm0      ; result = dy2 dx2 dy1 dx1
 
-	  mov	rsp,rbp ; rsp <- aligned rbp
-	  pop	rsp		; rsp <- original rbp
-	  pop	rbp
-	  ret
+	  leaveFunction
 
-section	.data
+;-----------------------------------------------------------------
+; Function memFill32SSE2
+;
+; C prototype;
+; void memFill32SSE2(vplUint32* dest,vplUint32* value,vplUint count)
+;
+; Data must be aligned before calling this.
+
+
+memFill32SSE2:
+
+      enterFunction
+
+      ; Load data and shuffle data
+      movd xmm0,[ARG2]     ; xmm0 = 0 0 0 value
+      shufps xmm0,xmm0,0x0 ; xmm0 = value value value value
+
+	  cmp ARG3,64
+      jl fill32
+
+fill64:
+	  ; Write to memory
+	  movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0  
+      movaps [ARG1 + 48],xmm0  
+      movaps [ARG1 + 64],xmm0  
+      movaps [ARG1 + 80],xmm0  
+      movaps [ARG1 + 96],xmm0  
+      movaps [ARG1 + 112],xmm0  
+	  movaps [ARG1 + 128],xmm0  
+      movaps [ARG1 + 144],xmm0  
+      movaps [ARG1 + 160],xmm0  
+      movaps [ARG1 + 176],xmm0  
+      movaps [ARG1 + 192],xmm0  
+      movaps [ARG1 + 208],xmm0  
+      movaps [ARG1 + 224],xmm0  
+      movaps [ARG1 + 240],xmm0  
+
+	  ;Increase address, decrease remaining pixels
+      sub ARG3,64
+      add ARG1,256
+
+	  ; Loop?
+	  cmp ARG3,64
+      jge fill64
+
+fill32:
+	  cmp ARG3,32
+      jl fill16
+
+      movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0  
+      movaps [ARG1 + 48],xmm0  
+      movaps [ARG1 + 64],xmm0  
+      movaps [ARG1 + 80],xmm0  
+      movaps [ARG1 + 96],xmm0  
+      movaps [ARG1 + 112],xmm0 
+
+      sub ARG3, 32
+      add ARG1, 128
+
+fill16:
+      cmp ARG3,16
+      jl fill8
+
+      movaps [ARG1],xmm0  
+      movaps [ARG1 + 16],xmm0  
+      movaps [ARG1 + 32],xmm0 
+      movaps [ARG1 + 48],xmm0 
+
+      sub ARG3, 16
+      add ARG1, 64
+
+fill8:
+      cmp ARG3,8
+      jl fill4
+
+      movaps [ARG1],xmm0 
+      movaps [ARG1 + 16],xmm0
+
+      sub ARG3, 8
+      add ARG1, 32
+
+fill4:
+      cmp ARG3,4
+      jl fill2
+
+      movaps [ARG1],xmm0  
+      
+      sub ARG3, 4
+      add ARG1, 16
+
+fill2:
+      cmp ARG3,2
+      jl fill1
+
+      movq [ARG1],xmm0
+
+      sub ARG3, 2
+      add ARG1, 8
+
+fill1:
+      cmp ARG3,0
+      je fillEnd
+
+      mov ARG3,[ARG2]
+      mov [ARG1],ARG3_32
+
+fillEnd:
+
+      leaveFunction

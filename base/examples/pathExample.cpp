@@ -19,6 +19,9 @@
 
 int main()
 {
+    // Set the log level
+    vpl::Log::logLevel() = vpl::Log::cLogLevelInfo;
+
 	// Create a cube
 	vpl::Path path;
 
@@ -55,10 +58,10 @@ int main()
 		STD_LOG_INFO() << *(points + 2*i) << "," << *(points + 2*i + 1);
 
 	pointGenerator.generatePoints(path,matrix);
-	
+
 	points = pointGenerator.getPoints();
 	numPoints = pointGenerator.getNumberOfPoints();
-	
+
 	STD_LOG_INFO() << "\nDumping transformed points(transformed during generation)";
 
 	for(vplUint i = 0; i < numPoints; i++)

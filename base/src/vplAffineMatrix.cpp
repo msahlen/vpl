@@ -24,11 +24,27 @@
 #define SY  m_[4]
 #define TY  m_[5]
 
-#ifdef USE_SSE_
-extern "C" void PRE_CDECL_ transformSSE(const float* transform,
-                                        float* vectors,
-                                        vplUint numVectors) POST_CDECL_;
-#endif // USE_SSE__
+#ifdef USE_SSE2_
+
+extern "C" void PRE_CDECL_ batchTransform(const float* transform,
+                                          float* vectors,
+                                          vplUint numVectors) POST_CDECL_;
+#else
+
+inline void batchTransform(const float* transform,
+                           float* vectors,
+                           vplUint numVectors)
+{
+    for (vplUint i = 0;i < numVectors;i+=2)
+    {
+        float tmpX  = vectors[2*i];
+
+        vectors[2*i] = tmpX * transform[0]  + vectors[2*i+1] * transform[1] + transform[2];
+        vectors[2*i+1] = tmpX * transform[3] + vectors[2*i+1] * transform[4]  + transform[5];
+    }
+}
+
+#endif // USE_SSE2__
 
 namespace vpl
 {
@@ -38,6 +54,7 @@ namespace vpl
         SX  = SY = m_[8] = 1.0f;
         SHX = TX = SHY = TY = m_[6] = m_[7] = 0.0f;
     }
+
     void AffineMatrix::setMatrix(float sx,float shx,float tx,
                                  float shy,float sy, float ty)
     {
@@ -54,6 +71,7 @@ namespace vpl
         TX += x;
         TY += y;
     }
+
     void AffineMatrix::scale(float x,float y)
     {
         SX *= x;
@@ -63,6 +81,7 @@ namespace vpl
         SY *= y;
         TY *= y;
     }
+
     void AffineMatrix::scale(float s)
     {
         SX *= s;
@@ -72,6 +91,7 @@ namespace vpl
         SY *= s;
         TY *= s;
     }
+
     void AffineMatrix::rotate(float rads)
     {
         float cosRads = cos(rads);
@@ -87,6 +107,7 @@ namespace vpl
         SHX = t1;
         TX  = t2;
     }
+
     void AffineMatrix::shear(float radX,float radY)
     {
         float tanX = tan(radX);
@@ -103,21 +124,25 @@ namespace vpl
         SY  = t1;
         TY  = t2;
     }
+
     void AffineMatrix::getTranslation(float& x,float& y) const
     {
         x = TX;
         y = TY;
     }
+
     void AffineMatrix::getScale(float& x,float& y) const
     {
         x = SX;
         y = SY;
     }
+
     void AffineMatrix::getShear(float& x,float& y) const
     {
         x = SHX;
         y = SHY;
     }
+
     void AffineMatrix::makeIdentity()
     {
         SX  = SY = 1.0f;
@@ -137,11 +162,13 @@ namespace vpl
         vector.x_ = tmpX * SX  + vector.y_ * SHX + TX;
         vector.y_ = tmpX * SHY + vector.y_ * SY  + TY;
     }
+
     void AffineMatrix::transform(const Vector& vector,Vector& result) const
     {
         result.x_ = vector.x_ * SX  + vector.y_ * SHX + TX;
         result.y_ = vector.x_ * SHY + vector.y_ * SY  + TY;
     }
+
     void AffineMatrix::transform(float& x,float& y) const
     {
         float tmpX = x;
@@ -150,23 +177,15 @@ namespace vpl
         x = tmpX * SX  + tmpY * SHX + TX;
         y = tmpX * SHY + tmpY * SY  + TY;
     }
-    void AffineMatrix::transform(float *vectors,vplUint numVectors) const
-    {
 
-    #ifdef USE_SSE_
-        transformSSE(m_,vectors,numVectors);
-    #else
-        for (vplUint i = 0;i < numVectors;i++)
-        {
-            transform(*(vectors),*(vectors+ 1));
-            vectors += 2;
-        }
-    #endif
+    void AffineMatrix::transform(float* vectors,vplUint numVectors) const
+    {
+        batchTransform(m_,vectors,numVectors);
     }
 
     void AffineMatrix::transform(DynamicArray<float>& vectors) const
     {
-        transform(vectors.getContents(),vectors.getItemCount()/2);
+        batchTransform(m_,vectors.getContents(),vectors.getItemCount()/2);
     }
     // Invert the matrix
     void AffineMatrix::invert()

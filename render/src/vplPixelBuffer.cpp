@@ -24,7 +24,7 @@ static inline vplUint findNextPowerOf2(vplUint& i,vpl::Alignment alignment)
 		i = alignment;
 
   vplUint k = alignment;
-  
+
   while (k < i)
     k *= 2;
 
@@ -36,6 +36,7 @@ namespace vpl
     PixelBuffer::PixelBuffer():width_(0),height_(0),pitch_(0),buffer_(0){}
     PixelBuffer::~PixelBuffer(){}
 
+	// Initialize the pixelbuffer, and set pitch according to alignment requirements
     void PixelBuffer::initialize(vplUint width,vplUint height,Alignment alignment)
     {
         if(buffer_)
@@ -53,37 +54,20 @@ namespace vpl
 		else
 			buffer_ = new DynamicMemory<vplUint32>(height_*pitch_);
 
-		memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
+		vplMemFill(buffer_->getMemory(),(vplUint32)0,pitch_*height_);
     }
+
     void PixelBuffer::clear()
     {
-        memset(buffer_->getMemory(),0x00,pitch_*height_*sizeof(vplUint32));
+        vplMemFill(buffer_->getMemory(),(vplUint32)0,pitch_*height_);
     }
-    void PixelBuffer::clear(const Color& color)
+
+	void PixelBuffer::clear(const Color& color)
     {
         vplUint32 c = color.getColorRGBA();
 
         c = preMultiplyColorRGBA(c);
 
-		vplUint32* dest = buffer_->getMemory();
-
-        // Duff it
-        vplUint count = pitch_ * height_;
-
-        register vplUint n = (count + 7) / 8;
-
-        switch(count & 0x07)
-        {
-            case 0: do
-            {   *dest++ = c;
-                case 7: *dest++ = c;
-                case 6: *dest++ = c;
-                case 5: *dest++ = c;
-                case 4: *dest++ = c;
-                case 3: *dest++ = c;
-                case 2: *dest++ = c;
-                case 1: *dest++ = c;
-            } while (--n > 0);
-        }
+        vplMemFill(buffer_->getMemory(),c,pitch_*height_);
     }
 }

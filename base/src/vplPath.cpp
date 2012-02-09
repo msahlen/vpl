@@ -18,11 +18,12 @@
 #include "vplAffineMatrix.h"
 #include "vplPath.h"
 
-#ifdef USE_SSE_
+#ifdef USE_SSE2_
 
 extern "C" void PRE_CDECL_ estimateFlatness(float* bezier,float* deltas) POST_CDECL_;
 
 #define DECLARE_ARRAY(a) MEM_ALIGN(a,16)
+#define ALIGN_ARRAY(b) b.align(cAlign16)
 
 #else
 
@@ -39,6 +40,7 @@ inline static void estimateFlatness(float* bezier,float* deltas)
 }
 
 #define DECLARE_ARRAY(a) a
+#define ALIGN_ARRAY(b)
 
 #endif // USE_SSE__
 
@@ -194,7 +196,10 @@ namespace vpl
     }
 
 	PointGenerator::PointGenerator():deltaLimit_(0.25f),previousCommand_(0),
-			                         subPathIterator_(0){}
+			                         subPathIterator_(0)
+	{
+		ALIGN_ARRAY(points_);
+	}
 
 	void PointGenerator::generatePoints(const Path& path,const AffineMatrix& transform)
 	{
