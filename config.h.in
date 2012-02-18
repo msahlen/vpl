@@ -76,7 +76,7 @@ typedef uintptr_t vplPtr;
 #else // HAVE_STDINT_H
 
 #ifdef _MSC_VER
-
+#include <BaseTsd.h>
 typedef signed char vplInt8;
 typedef signed short vplInt16;
 typedef signed __int32 vplInt32;

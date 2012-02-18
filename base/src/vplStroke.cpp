@@ -570,15 +570,33 @@ namespace vpl
 
         dir.invert();
 
-        computeIntersection(realPoint + before,realPoint + after,prevDir,dir,intersection);
+        bool intersectionExists = computeIntersection(realPoint + before,
+                                                      realPoint + after,
+                                                      prevDir,dir,
+                                                      intersection);
 
-        stroker->scale_.transform(intersection);
-        stroker->scale_.transform(after);
+        if(intersectionExists)
+        {
+            float angle = computeAngle(dir,prevDir);
+            float limit = 1/sin(angle/2);
+           
+            if(limit > stroker->miterLimit_)
+            {
+                stroker->bevelJoiner(stroker,point,beforeNormal,afterNormal);
+                return;
+            }
 
-        stroker->addPoint(outer,intersection);
-        stroker->addPoint(outer,point + after);
+            stroker->scale_.transform(intersection);
+            stroker->scale_.transform(after);
 
-        stroker->innerJoiner(inner,point,after);
+            stroker->addPoint(outer,intersection);
+            stroker->addPoint(outer,point + after);
+            
+            stroker->innerJoiner(inner,point,after);
+        }
+        else
+            stroker->bevelJoiner(stroker,point,beforeNormal,afterNormal);
+
     }
 
     void Stroker::roundJoiner(Stroker* stroker,
