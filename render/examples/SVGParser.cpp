@@ -33,6 +33,7 @@ static inline int round(float f)
 {
     return f >= 0.0f ? int(f + 0.5f) : int(f - int(f - 1) + 0.5f) + int(f - 1);
 }
+
 // Tokenizer function
 static inline size_t tokenize(const std::string& str,
                               std::vector<std::string>& tokens,
@@ -97,6 +98,7 @@ static inline vplUint tokenize(const std::string& str,
     }
     return delimitersFound.size();
 }
+
 static inline void replace(std::string& str,
                            const std::string& oldString,
                            const std::string& newString)

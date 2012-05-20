@@ -25,6 +25,7 @@ set(VPL_RENDER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/vplBlend.h
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplNonZeroMaskGenerator.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplPixelBuffer.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplPixelCoverage.h
+                       ${CMAKE_CURRENT_SOURCE_DIR}/src/vplPng.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplRender.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplRenderer.cpp
                        ${CMAKE_CURRENT_SOURCE_DIR}/src/vplSampleMasks.h

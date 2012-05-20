@@ -14,7 +14,7 @@
  * License along with this library;
  * if not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #ifndef VPL_CONFIG_H_INCLUDED_
 #define VPL_CONFIG_H_INCLUDED_
 
@@ -94,6 +94,7 @@ typedef UINT_PTR vplPtr;
 
 typedef unsigned int  vplUint;
 typedef unsigned char vplUchar;
+typedef int vplInt;
 
 #endif // VPL_CONFIG_H_INCLUDED_
 

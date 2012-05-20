@@ -109,4 +109,11 @@ namespace vpl
         path.largeCWArcToAbs(centerX - radiusX,centerY,radiusX,radiusY,0.0f);
         path.closePath();
     }
+
+    VPL_API bool readPng(const char* path,PixelBuffer& pixels)
+    {
+    }
+    VPL_API void writePng(const char* path,const PixelBuffer& pixels)
+    {
+    }
 }

@@ -53,37 +53,37 @@ namespace vpl
         {
             color_ = color;
         }
-        
+
 		inline void setOpacity(vplUchar alpha)
         {
             color_.setAlpha(alpha);
         }
-        
+
 		inline void setGradient(Gradient* gradient)
         {
             gradient_ = gradient;
         }
-        
+
 		inline void setSize(float size)
         {
             size_ = size;
         }
-        
+
 		inline void setMiterLimit(float limit)
         {
             miterLimit_ = limit;
         }
-        
+
 		inline void setEndType(Stroker::EndType endType)
         {
             endType_ = endType;
         }
-        
+
 		inline void setJoinType(Stroker::JoinType joinType)
         {
             joinType_ = joinType;
         }
-        
+
 		inline void setBlendMode(BlendMode blendMode)
         {
             blendMode_ = blendMode;
@@ -94,37 +94,37 @@ namespace vpl
         {
             return color_.getColorRGBA();
         }
-        
+
 		inline vplUint32 getColorAsARGB() const
         {
             return color_.getColorARGB();
         }
-        
+
 		inline Gradient* getGradient() const
         {
             return gradient_;
         }
-        
+
 		inline float getSize() const
         {
             return size_;
         }
-        
+
 		inline float getMiterLimit() const
         {
             return miterLimit_;
         }
-        
+
 		inline Stroker::EndType getEndType() const
         {
             return endType_;
         }
-        
+
 		inline Stroker::JoinType getJoinType() const
         {
             return joinType_;
         }
-        
+
 		inline BlendMode getBlendMode() const
         {
             return blendMode_;
@@ -161,22 +161,22 @@ namespace vpl
         {
             color_ = color;
         }
-        
+
 		inline void setOpacity(vplUchar alpha)
         {
             color_.setAlpha(alpha);
         }
-        
+
 		inline void setGradient(Gradient* gradient)
         {
             gradient_ = gradient;
         }
-        
+
 		inline void setBlendMode(BlendMode blendMode)
         {
             blendMode_ = blendMode;
         }
-        
+
 		inline void setFillMode(FillMode fillMode)
         {
             fillMode_ = fillMode;
@@ -187,23 +187,23 @@ namespace vpl
         {
             return color_.getColorRGBA();
         }
-        
+
 		inline vplUint32 getColorAsARGB() const
         {
             return color_.getColorARGB();
         }
-        
+
 		inline Gradient* getGradient() const
         {
             return gradient_;
         }
-        
+
 		inline BlendMode getBlendMode() const
         {
             return blendMode_;
 
         }
-        
+
 		inline FillMode getFillMode() const
         {
             return fillMode_;
@@ -227,7 +227,7 @@ namespace vpl
         void initialize(vplUint width,
 			            vplUint height,
 						Alignment alignment = cNoAlignment);
-        
+
 		void clear();
 		void clear(const Color& color);
 
@@ -307,15 +307,15 @@ namespace vpl
             void fill(BlendMode blendMode,Brush::FillMode fillMode,
 				      vplUint32 color,Gradient* gradient,
 					  ScanLineList* scanLines);
-            
+
 			void drawNewEdges();
             PathReference* allocateReference(const Path* path,
                                              const Pen* pen,
 								             const Brush* brush);
-			
+
 			void deAllocateReference(PathReference* reference);
 			void generateEdges(PathReference* reference);
-			
+
 			// Dimensions of backbuffer
 			vplUint width_;
             vplUint height_;
@@ -349,6 +349,10 @@ namespace vpl
                                      float radiusX,float radiusY);
     VPL_API void drawEllipse(Path& path,float centerX,float centerY,
                              float radiusX,float radiusY);
+
+    VPL_API void readPng(const char* path,PixelBuffer& pixels);
+    VPL_API void writePng(const char* path,const PixelBuffer& pixels);
+
 
 }
 #endif
